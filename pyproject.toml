@@ -1,0 +1,20 @@
+[project]
+name = "agents"
+version = "0.1.0"
+description = "A collection of well-crafted AI agents powered by Claude, callable from code or as Claude Code Skills."
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=0.39.0",
+    "click>=8.1.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+agents = "agents.cli:main"
+
+[build-system]
+requires = ["setuptools>=75.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-dir]
+"agents" = "src/agents"
