@@ -11,10 +11,11 @@ from __future__ import annotations
 
 import click
 
-from agents import PromptEngineer
+from agents import ProductResearcher, PromptEngineer
 
 _REGISTRY = {
     "prompt-engineer": PromptEngineer,
+    "product-researcher": ProductResearcher,
 }
 
 

@@ -41,6 +41,7 @@ Copy the corresponding `.md` file from `skills/` into your Claude Code skills di
 | # | Agent | Description |
 |---|-------|-------------|
 | 1 | PromptEngineer | 提示词工程专家，根据需求设计高质量结构化提示词 |
+| 2 | ProductResearcher | AI产品调研专家，1小时内完成竞品快调研与机会发现 |
 
 ## License
 
