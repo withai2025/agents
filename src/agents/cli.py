@@ -11,9 +11,10 @@ from __future__ import annotations
 
 import click
 
-from agents import CodingStandards, MobileArchitect, PRDExpert, ProductResearcher, PromptEngineer, UXDesigner
+from agents import CodingStandards, DBSchemaArchitect, MobileArchitect, PRDExpert, ProductResearcher, PromptEngineer, UXDesigner
 
 _REGISTRY = {
+    "db-schema-architect": DBSchemaArchitect,
     "coding-standards": CodingStandards,
     "mobile-architect": MobileArchitect,
     "prd-expert": PRDExpert,
