@@ -49,6 +49,7 @@ Copy the corresponding `.md` file from `skills/` into your Claude Code skills di
 | 7 | DBSchemaArchitect | 数据库 Schema 架构师，生成 PostgreSQL/SQLite/ER图/RLS/同步策略完整设计 |
 | 8 | APIContractArchitect | API 接口契约架构师，生成完整 API 契约文档含 TypeScript 类型/SSE/幂等/请求函数模板 |
 | 9 | TaskDecomposer | 编码任务拆分专家，将全套文档拆解为分阶段任务书含依赖图/Claude Code指令/验收标准 |
+| 10 | ProjectOrchestrator | 全局编码任务控制器，管理从产品构想到完整可运行 APP 的全生命周期，调度 13 个子 Agent |
 
 ## License
 
