@@ -9,11 +9,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/withai2025/agents/stargazers"><img src="https://img.shields.io/github/stars/withai2025/agents?style=social" alt="GitHub stars"></a>
-  <a href="https://github.com/withai2025/agents/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="https://github.com/withai2025/AppForge/stargazers"><img src="https://img.shields.io/github/stars/withai2025/AppForge?style=social" alt="GitHub stars"></a>
+  <a href="https://github.com/withai2025/AppForge/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python 3.11+"></a>
   <a href="https://github.com/anthropics/anthropic-sdk-python"><img src="https://img.shields.io/badge/Anthropic%20SDK-0.40+-green.svg" alt="Anthropic SDK"></a>
-  <a href="https://github.com/withai2025/agents/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+  <a href="https://github.com/withai2025/AppForge/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
 </p>
 
 ---
@@ -343,8 +343,8 @@ User: "I want to build a running tracker app..."
 ### The Full Pipeline (Recommended)
 
 ```bash
-git clone https://github.com/withai2025/agents.git
-cd agents/project-orchestrator
+git clone https://github.com/withai2025/AppForge.git
+cd AppForge/project-orchestrator
 
 pip install -r requirements.txt
 cp .env.example .env   # add your ANTHROPIC_API_KEY
