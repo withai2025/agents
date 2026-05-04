@@ -1,345 +1,362 @@
-# 🚀 Agents — AI 智能体编排系统
+# ⚒️ AppForge
 
-> **从「我有一个 APP 想法」到完整可运行 APP，全生命周期 AI 驱动**
+> **Forge your app idea into a working product with 13 AI agents.**
+>
+> One sentence in → fully functional app out. No human coding required.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
-[![Anthropic SDK](https://img.shields.io/badge/Anthropic%20SDK-0.40+-green.svg)](https://github.com/anthropics/anthropic-sdk-python)
-
----
-
-## 🤔 这是什么？
-
-一个基于 **Anthropic Claude** 的智能体集合 + 编排系统。包含两个核心组件：
-
-| 组件 | 路径 | 用途 |
-|------|------|------|
-| 🎛️ **Project Orchestrator** | `project-orchestrator/` | 13 智能体全生命周期编排系统，从产品构想自动推进到完整 APP |
-| 📦 **Agents Python 库** | `src/agents/` | 单个 Agent 的程序化调用 + CLI + Claude Code Skill 格式 |
-
-> 想象你有一个 13 人的全栈开发团队——1 个项目经理 + 6 个规划专家 + 6 个执行工程师。你只需说「我想做一个跑步打卡 APP」，整个团队自动运转。
+<p align="center">
+  <a href="https://github.com/withai2025/agents/stargazers"><img src="https://img.shields.io/github/stars/withai2025/agents?style=social" alt="GitHub stars"></a>
+  <a href="https://github.com/withai2025/agents/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python 3.11+"></a>
+  <a href="https://github.com/anthropics/anthropic-sdk-python"><img src="https://img.shields.io/badge/Anthropic%20SDK-0.40+-green.svg" alt="Anthropic SDK"></a>
+  <a href="https://github.com/withai2025/agents/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+</p>
 
 ---
 
-## 🏗️ 全生命周期调度架构
+## 🤔 What Is AppForge?
 
-### 总览：两阶段流水线
+AppForge is an **AI-native APP development assembly line**. You describe what you want to build—in plain language—and 13 specialized AI agents take it from idea to a complete, runnable application.
+
+No more piecemeal AI coding assistants. AppForge runs the entire **product lifecycle**:
+
+```
+YOU SAY:                          APPFORGE DELIVERS:
+"我想做一个跑步打卡APP，           ✅ docs/PRD.md          (9-chapter product spec)
+ 可以记录路线、配速、               ✅ docs/TECH_ARCHITECTURE (tech stack, directory tree)
+ 消耗卡路里，加好友PK"             ✅ docs/CODING_STANDARDS (DO/DON'T code rules)
+                                   ✅ docs/DB_SCHEMA        (ER diagram, SQL, RLS)
+                                   ✅ docs/API_CONTRACT     (endpoints, types, error codes)
+                                   ✅ docs/TASK_BOOK        (phased task plan, Mock strategy)
+                                   ✅ Working React Native app (Expo + Supabase)
+```
+
+> **Think of it as**: Assembling a 13-person full-stack team—1 tech lead, 6 architects, 6 engineers—that never sleeps, never complains, and ships end-to-end.
+
+---
+
+## 🎯 Why AppForge?
+
+| Instead of... | AppForge... |
+|--------------|-------------|
+| Manually writing PRDs, tech specs, coding standards | **6 planning agents** generate all 6 documents in strict sequence, each validated against the previous |
+| Figuring out what to build next | **Orchestrator** reads project state and routes to the right agent automatically |
+| Switching between 5 different AI tools | **Single pipeline**: one conversation, 13 agents, zero context switching |
+| Hoping code quality stays consistent | **CODING_STANDARDS.md** is generated first, then enforced by every coding agent |
+| Manually tracking what's done | **project_state.json** tracks every task, retry count, and degradation status |
+| Abandoning projects mid-way | **Graceful degradation**: failed agents produce simplified output rather than blocking the pipeline |
+
+---
+
+## 🏗️ Architecture
+
+### The Assembly Line
+
+```
+                         ⚒️ AppForge
+                              │
+              ┌───────────────┼───────────────┐
+              │               │               │
+              ▼               ▼               ▼
+     ┌─────────────────────────────────────────────────┐
+     │              🧠 Orchestrator                     │
+     │         Claude Opus 4.7 + Tool Use               │
+     │                                                 │
+     │   Reads project_state.json → Decides next step  │
+     │            → Routes to correct agent            │
+     │            → Updates progress                   │
+     └──────────────────────┬──────────────────────────┘
+                            │
+          ┌─────────────────┴──────────────────┐
+          ▼                                    ▼
+┌──────────────────────┐          ┌──────────────────────┐
+│   PHASE 0: Planning   │          │  PHASE 1-N: Building  │
+│   (Strict Serial)     │          │  (Hybrid Parallel)    │
+│   ①→②→③→④→⑤→⑥       │          │  DB │ FE║BE │ CONNECT │
+│   6 docs auto-gen     │          │  VERIFY → FIX → SHIP  │
+└──────────────────────┘          └──────────────────────┘
+```
+
+### Phase 0: The Planning Pipeline (Strict Serial Chain)
+
+Every step consumes the output of the previous step. No skipping, no parallel execution—each document is the foundation for the next.
+
+```
+USER IDEA  "I want a running tracker app..."
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ ① 📝 PRD EXPERT                                                  │
+│    Input:  User's idea (even a single sentence)                   │
+│    Output: docs/PRD.md — 9 chapters, Given-When-Then criteria    │
+│    Gate:   ✅ No banned words  ✅ P0 ≤ 40% of total features      │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ ② 🏗️ TECH ARCHITECT                                              │
+│    Input:  docs/PRD.md                                          │
+│    Output: docs/TECH_ARCHITECTURE.md                            │
+│    Content: 2+ alternatives per tech choice, full directory tree,│
+│             MVP phases, zero-experience setup guide             │
+│    Gate:   ✅ Comparison table per choice  ✅ No vague language   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ ③ 📏 CODING STANDARDS                                            │
+│    Input:  PRD + TECH_ARCHITECTURE                              │
+│    Output: docs/CODING_STANDARDS.md — 13 chapters                │
+│    Content: Naming rules, component/store/service patterns,      │
+│             Git conventions, Cursor AI prompt template          │
+│    Gate:   ✅ DO/DON'T code examples  ✅ Dir tree matches ARCH   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ ④ 🗄️ SCHEMA ARCHITECT                                            │
+│    Input:  PRD + ARCH + STANDARDS (3 docs)                      │
+│    Output: docs/DB_SCHEMA.md                                    │
+│    Content: Mermaid ER diagram, PostgreSQL DDL, SQLite DDL,     │
+│             RLS policies, indexes, sync strategy, Redis keys    │
+│    Gate:   ✅ Every table traceable to PRD  ✅ SQL executable    │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ ⑤ 🔌 API CONTRACT ARCHITECT                                      │
+│    Input:  PRD + ARCH + STANDARDS + SCHEMA (4 docs)             │
+│    Output: docs/API_CONTRACT.md                                 │
+│    Content: Error code system, auth tiers, TypeScript types,     │
+│             pagination, file upload, weak-network resilience     │
+│    Gate:   ✅ Every PRD action → API  ✅ Fields match Schema      │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ ⑥ 📋 TASK DECOMPOSER                                             │
+│    Input:  ALL 5 docs above                                     │
+│    Output: docs/TASK_BOOK.md                                    │
+│    Content: Dependency graph (Mermaid), per-task file list,      │
+│             Mock data plan, copy-paste Claude Code prompts      │
+│    Gate:   ✅ Every page → task  ✅ Criteria = terminal commands  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 🔍 INDEPENDENT REVIEW (fresh conversation, zero context bias)    │
+│    Cross-document consistency → Operability → Completeness       │
+│    Output: Must Fix / Should Fix / Ignore / Score (1-10)         │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                     All clear ✅
+                             │
+                             ▼
+                  PHASE 1-N CODING BEGINS
+```
+
+### Phase 1-N: The Build Pipeline (Hybrid Serial-Parallel)
+
+```
+TASK_BOOK.md
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 1: INFRASTRUCTURE (forced serial — no parallel possible)   │
+│                                                                 │
+│ T00 ──▶ T01 ──▶ T02 ──▶ T03 ──▶ T04                            │
+│ Init     Config   Types    API      UI                           │
+│ project  files    defs     client   components                   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 2: AUTH MODULE                                            │
+│                                                                 │
+│ T05 (Auth Store) ──▶ T06 (Register) ║ T07 (Login) ← can parallel│
+│                           │                                      │
+│                           ▼                                      │
+│                   T08 (Auth Edge Function)                       │
+│                           │                                      │
+│                           ▼                                      │
+│                   T06 + T07: swap Mock → real API                │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ PHASE 3+: CORE FEATURES (frontend ‖ backend allowed)            │
+│                                                                 │
+│                 ┌──────────────┐                                 │
+│                 │  🗃️ Agent-DB  │   Run migrations               │
+│                 └──────┬───────┘                                 │
+│                        │                                         │
+│          ┌─────────────┼─────────────┐                           │
+│          ▼             ▼             ▼                           │
+│   ┌──────────┐ ┌──────────┐ ┌──────────┐                        │
+│   │ 🎨 FE    │ │ 🔧 BE    │ │ 🎨 FE    │  ← up to 3 in parallel  │
+│   │ Feed pg  │ │ Post API │ │ New Post │                        │
+│   │ +Mock    │ │          │ │ +Mock    │                        │
+│   └────┬─────┘ └────┬─────┘ └────┬─────┘                        │
+│        │            │            │                                │
+│        └────────────┼────────────┘                                │
+│                     ▼                                            │
+│             ┌──────────────┐                                     │
+│             │ 🔗 CONNECT    │  Replace Mock → real API            │
+│             └──────┬───────┘                                     │
+│                    ▼                                             │
+│             ┌──────────────┐                                     │
+│             │ ✅ VERIFY     │  Run acceptance tests               │
+│             └──┬───────┬───┘                                     │
+│                │       │                                         │
+│           Pass ✅   Fail ❌                                       │
+│                │       ▼                                         │
+│                │  ┌──────────┐                                    │
+│                │  │ 🩹 FIX    │  Fix → re-verify                  │
+│                │  └────┬─────┘                                    │
+│                ▼       │                                         │
+│           Next Task ◀──┘                                         │
+└─────────────────────────────────────────────────────────────────┘
+                             │
+                    All tasks done
+                             │
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 🔍 MILESTONE REVIEW (fresh conversation)                         │
+│    Zero "must fix" items → 🎉 COMPLETE, RUNNING APP               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 👥 The 13-Agent Roster
+
+### 🎛️ Orchestrator
+
+| Agent | Model | Role |
+|-------|-------|------|
+| 🧠 **Orchestrator** | Claude Opus 4.7 | Reads project state → decides next agent → dispatches via Tool Use → updates progress |
+
+### 📋 Phase 0: The Planning Crew (strict serial, 6 agents)
+
+| # | Agent | Output | Depends On | What It Does |
+|---|-------|--------|------------|--------------|
+| 1 | 📝 **PRD Expert** | `docs/PRD.md` | User idea | Vague idea → 9-chapter structured PRD with Given-When-Then acceptance criteria |
+| 2 | 🏗️ **Tech Architect** | `docs/TECH_ARCHITECTURE.md` | PRD | Tech comparison tables, directory tree, MVP phases, zero-experience setup guide |
+| 3 | 📏 **Coding Standards** | `docs/CODING_STANDARDS.md` | Tech Arch | 13-chapter coding bible with DO/DON'T examples, Cursor AI prompt template |
+| 4 | 🗄️ **Schema Architect** | `docs/DB_SCHEMA.md` | Standards | Mermaid ER diagrams, PostgreSQL + SQLite DDL, RLS policies, sync strategies |
+| 5 | 🔌 **API Contract** | `docs/API_CONTRACT.md` | Schema | Endpoint definitions, TypeScript types, error code system, weak-network resilience |
+| 6 | 📋 **Task Decomposer** | `docs/TASK_BOOK.md` | All 5 docs | Phased task plan with dependency graph, Mock plan, copy-paste Claude Code prompts |
+
+### 💻 Phase 1-N: The Build Crew (hybrid serial-parallel, 6 agents)
+
+| Agent | Trigger | Delivers |
+|-------|---------|----------|
+| 🗃️ **Agent-DB** | Migration task in TASK_BOOK | Supabase `CREATE TABLE` + RLS SQL |
+| 🔧 **Agent-BE** | Edge Function task | TypeScript Deno Edge Function code |
+| 🎨 **Agent-FE** | Page/component task | React Native page + inline Mock data + `// TODO: TXX` markers |
+| 🔗 **Agent-CONNECT** | FE + BE both complete | Mock → real API, snake_case/camelCase field mapping |
+| ✅ **Agent-VERIFY** | Any coding task done | Per-criterion pass/fail report (no vague "looks good") |
+| 🩹 **Agent-FIX** | Compile error / verify fail | Fix with exact file path + line number, minimal diff |
+
+---
+
+## 🎛️ The Orchestrator's Tool Belt
+
+The Orchestrator doesn't guess—it uses 4 Anthropic Tool Use functions to make data-driven scheduling decisions:
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
+│                        🧠 Orchestrator                            │
 │                                                                  │
-│   💬 用户构想                 🎛️ Orchestrator                   🎉 完整 APP   │
-│   "我想做XX APP"    ──────────────────────────▶    交付           │
-│                         │                            ▲           │
-│                         │  Tool Use 动态调度          │           │
-│                         ▼                            │           │
-│              ┌─────────────────────┐                  │           │
-│              │   Phase 0 (严格串行)  │                  │           │
-│              │   ① → ② → ③ → ④ → ⑤ → ⑥  │              │           │
-│              │   六份规划文档自动生成    │                  │           │
-│              └──────────┬──────────┘                  │           │
-│                         │                            │           │
-│                         ▼                            │           │
-│              ┌─────────────────────┐                  │           │
-│              │  Phase 1-N (混合串并行)│ ─────────────────┘           │
-│              │  DB │ FE║BE │ CONNECT │                              │
-│              │     VERIFY → FIX      │                              │
-│              └─────────────────────┘                                │
+│  ┌─────────────────────┐          ┌─────────────────────┐        │
+│  │ read_project_state   │          │ read_file            │        │
+│  │ "What's the current  │          │ "Show me what's in   │        │
+│  │  status of every     │          │  this doc/code file" │        │
+│  │  agent and task?"    │          │                      │        │
+│  └─────────────────────┘          └─────────────────────┘        │
+│                                                                  │
+│  ┌─────────────────────┐          ┌─────────────────────┐        │
+│  │ route_to_agent       │          │ update_state         │        │
+│  │ "Dispatch Agent-X    │          │ "Mark task complete,  │        │
+│  │  with this task +    │          │  record failure,      │        │
+│  │  all required docs"  │          │  update retry count"  │        │
+│  └─────────────────────┘          └─────────────────────┘        │
 │                                                                  │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-### Phase 0 详细流程：文档生成串行链
-
-每步的输出是下一步的输入，严格有序，不可并行：
+### One Complete Scheduling Cycle
 
 ```
-┌───────────────┐
-│  用户构想      │  "我想做一个跑步打卡APP，可以记录路线、配速、
-│  (一句话即可)  │   消耗卡路里，还能加好友互相PK"
-└───────┬───────┘
-        │
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  ① 📝 Agent-PRD：PRD 专家                      ║
-║     输入：用户构想                                           ║
-║     产出：docs/PRD.md（9 章节，含用户角色/功能模块/验收标准）    ║
-║     校验：✅ Given-When-Then 验收标准  ✅ 无模糊禁用词         ║
-╚══════════════════════════════════════════════════════════════╝
-        │
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  ② 🏗️ Agent-ARCH：技术架构师                     ║
-║     输入：docs/PRD.md                                       ║
-║     产出：docs/TECH_ARCHITECTURE.md                         ║
-║     内容：技术选型对比(2+方案) / 目录结构 / MVP阶段 / 环境搭建 ║
-║     校验：✅ 每个选型有对比表格  ✅ 零经验可跟随的环境搭建步骤   ║
-╚══════════════════════════════════════════════════════════════╝
-        │
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  ③ 📏 Agent-STANDARDS：编码规范专家                ║
-║     输入：docs/PRD.md + docs/TECH_ARCHITECTURE.md           ║
-║     产出：docs/CODING_STANDARDS.md（13 章节）                 ║
-║     内容：命名规范/组件规范/Store规范/Service规范/Cursor模板   ║
-║     校验：✅ DO/DON'T 代码示例  ✅ 与技术方案目录结构一致      ║
-╚══════════════════════════════════════════════════════════════╝
-        │
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  ④ 🗄️ Agent-SCHEMA：Schema 架构师                 ║
-║     输入：PRD + 技术方案 + 编码规范（3 份文档）                 ║
-║     产出：docs/DB_SCHEMA.md                                  ║
-║     内容：ER图(Mermaid) / PostgreSQL DDL / SQLite DDL /      ║
-║           RLS策略 / 索引策略 / Redis缓存键 / 同步策略          ║
-║     校验：✅ 每表可追溯PRD原文  ✅ SQL可直接执行 无占位符      ║
-╚══════════════════════════════════════════════════════════════╝
-        │
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  ⑤ 🔌 Agent-API：API 契约架构师                   ║
-║     输入：PRD + 技术方案 + 编码规范 + Schema（4 份文档）       ║
-║     产出：docs/API_CONTRACT.md                               ║
-║     内容：错误码体系 / 鉴权分级 / TypeScript类型 /            ║
-║           分页规范 / 文件上传 / 弱网容错 / 请求函数模板          ║
-║     校验：✅ PRD每个操作有对应接口  ✅ 字段名与Schema完全一致   ║
-╚══════════════════════════════════════════════════════════════╝
-        │
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  ⑥ 📋 Agent-DECOMP：任务拆分专家                   ║
-║     输入：全部五份文档                                         ║
-║     产出：docs/TASK_BOOK.md                                  ║
-║     内容：依赖图(Mermaid) / 每任务文件清单 / Mock方案 /         ║
-║           零代码验收标准 / 可复制Claude Code指令                ║
-║     校验：✅ 每页面有对应任务  ✅ 验收标准全是终端命令          ║
-╚══════════════════════════════════════════════════════════════╝
-        │
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  🔍 Agent-REVIEW：独立审查（新对话，全新视角）                 ║
-║     检查：6 份文档交叉一致性 / 可操作性 / 完整性                ║
-║     输出：必须修复项 / 建议修复项 / 可忽略项 / 评分 1-10        ║
-╚══════════════════════════════════════════════════════════════╝
-        │
-        │  审查通过 ✅
-        ▼
-   进入 Phase 1-N 编码执行
-```
-
-### Phase 1-N 详细流程：编码执行混合串并行
-
-```
-docs/TASK_BOOK.md
-        │
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  Phase 1：基础设施链（强制串行）                              ║
-║                                                              ║
-║  T00 ──▶ T01 ──▶ T02 ──▶ T03 ──▶ T04                       ║
-║  项目    基础    全局    请求    基础                          ║
-║  初始化  配置    类型    封装    UI组件                         ║
-╚══════════════════════════════════════════════════════════════╝
-        │
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  Phase 2：认证模块                                            ║
-║                                                              ║
-║  T05 (Auth Store) ──▶ T06 (注册页) ║ T07 (登录页)            ║
-║                            │                                  ║
-║                            ▼                                  ║
-║                    T08 (Auth Edge Function)                  ║
-║                            │                                  ║
-║                            ▼                                  ║
-║                    T06 + T07 替换 Mock → 真实 API             ║
-╚══════════════════════════════════════════════════════════════╝
-        │
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  Phase 3+：核心功能（前后端可并行）                            ║
-║                                                              ║
-║                   ┌──────────────┐                            ║
-║                   │  🗃️ Agent-DB  │                            ║
-║                   │  数据库迁移    │                            ║
-║                   └──────┬───────┘                            ║
-║                          │                                    ║
-║            ┌─────────────┼─────────────┐                      ║
-║            ▼             ▼             ▼                      ║
-║   ┌────────────┐ ┌────────────┐ ┌────────────┐                ║
-║   │ 🎨 Agent-FE │ │ 🔧 Agent-BE │ │ 🎨 Agent-FE │  ← 可并行   ║
-║   │  首页Feed   │ │  Post接口   │ │  发帖页面   │              ║
-║   │  (含Mock)   │ │             │ │  (含Mock)   │              ║
-║   └─────┬──────┘ └──────┬─────┘ └─────┬──────┘                ║
-║         │               │             │                        ║
-║         └───────────────┼─────────────┘                        ║
-║                         ▼                                      ║
-║                 ┌──────────────┐                               ║
-║                 │ 🔗 CONNECT    │  前后端联调                    ║
-║                 │  Mock→真实API │                               ║
-║                 └──────┬───────┘                               ║
-║                        ▼                                       ║
-║                 ┌──────────────┐                               ║
-║                 │ ✅ VERIFY     │  验收测试                      ║
-║                 └──┬───────┬───┘                               ║
-║                    │       │                                   ║
-║               通过 ✅   失败 ❌                                  ║
-║                    │       ▼                                   ║
-║                    │  ┌──────────┐                              ║
-║                    │  │ 🩹 FIX    │  修复 → 重新验收             ║
-║                    │  └──────────┘                              ║
-║                    ▼       │                                   ║
-║                下一个任务 ◀─┘                                   ║
-╚══════════════════════════════════════════════════════════════╝
-        │
-        │  所有任务完成
-        ▼
-╔══════════════════════════════════════════════════════════════╗
-║  🔍 Agent-REVIEW：里程碑独立审查（新对话）                     ║
-║     无"必须修复"项 → 🎉 完整可运行的 APP                       ║
-╚══════════════════════════════════════════════════════════════╝
+User: "I want to build a running tracker app..."
+                │
+                ▼
+┌──────────────────────────────┐
+│ Orchestrator reads state     │
+│ → PRD.md missing             │
+│ → Phase 0, Step 1 needed     │
+└──────────────┬───────────────┘
+               ▼
+┌──────────────────────────────┐
+│ Orchestrator outputs:        │
+│ 📊 Status: Phase 0, Step 1   │
+│ 🗺️ Plan:   Route to PRD      │
+│    Expert — no input docs    │
+│    needed, just the user's   │
+│    product idea              │
+└──────────────┬───────────────┘
+               ▼
+┌──────────────────────────────┐
+│ Tool Use: route_to_agent(    │
+│   agent="prd_expert",        │
+│   task="Generate PRD for     │
+│         running tracker...", │
+│   plan={reason: "...",       │
+│         expected_output:     │
+│         "docs/PRD.md"}       │
+│ )                            │
+└──────────────┬───────────────┘
+               ▼
+┌──────────────────────────────┐
+│ Worker executes:             │
+│ 1. Load prd_expert.md prompt │
+│ 2. Stream PRD to terminal    │
+│ 3. Save to docs/PRD.md       │
+│ 4. Mark state: completed     │
+└──────────────┬───────────────┘
+               ▼
+┌──────────────────────────────┐
+│ Orchestrator: update_state() │
+│ ➡️ Next: Tech Architect      │
+│    (input: docs/PRD.md)      │
+└──────────────────────────────┘
 ```
 
 ---
 
-## 👥 13 智能体全名册
+## ⚡ Quick Start
 
-### 🎛️ 总调度器
-
-| Agent | 模型 | 核心职责 |
-|-------|------|---------|
-| 🧠 **Orchestrator** | Claude Opus 4.7 | 读取项目状态 → 分析下一步 → Tool Use 动态路由子 Agent → 更新进度 |
-
-### 📋 Phase 0：规划专家团队（严格串行，6 人）
-
-| # | Agent | 产出文档 | 依赖 | 一句话 |
-|---|-------|---------|------|--------|
-| 1 | 📝 PRD 专家 | `docs/PRD.md` | 用户构想 | 模糊想法 → 9 章节结构化 PRD，Given-When-Then 验收标准 |
-| 2 | 🏗️ 技术架构师 | `docs/TECH_ARCHITECTURE.md` | PRD | 技术选型对比 + 目录结构 + MVP 路径 + 环境搭建 |
-| 3 | 📏 编码规范专家 | `docs/CODING_STANDARDS.md` | 技术方案 | 13 章编码规范，DO/DON'T 示例，Cursor Prompt 模板 |
-| 4 | 🗄️ Schema 架构师 | `docs/DB_SCHEMA.md` | 编码规范 | ER 图 + PostgreSQL/SQLite DDL + RLS + 同步策略 |
-| 5 | 🔌 API 契约架构师 | `docs/API_CONTRACT.md` | Schema | API 定义 + TS 类型 + 错误码 + 鉴权分级 + 弱网容错 |
-| 6 | 📋 任务拆分专家 | `docs/TASK_BOOK.md` | 全部五文档 | 分阶段任务书 + 依赖图 + Mock 策略 + Claude Code 指令 |
-
-### 💻 Phase 1-N：编码执行团队（混合串并行，6 人）
-
-| Agent | 触发条件 | 产出 |
-|-------|---------|------|
-| 🗃️ **Agent-DB** | 任务书数据库迁移任务 | Supabase 建表 SQL + RLS 策略 |
-| 🔧 **Agent-BE** | 后端 Edge Function 任务 | TypeScript Edge Function 代码 |
-| 🎨 **Agent-FE** | 前端页面/组件任务 | React Native 页面 + Mock 数据 + TODO 注释 |
-| 🔗 **Agent-CONNECT** | 前后端均已完成 | Mock 替换为真实 API 调用 |
-| ✅ **Agent-VERIFY** | 任意编码任务完成后 | 逐条验收报告（✅ 通过 / ❌ 未通过） |
-| 🩹 **Agent-FIX** | 编译报错、验收失败 | 精确到行号的修复方案 |
-
----
-
-## 🎛️ Orchestrator 调度机制
-
-Orchestrator 通过 Anthropic **Tool Use** 实现全自动调度决策，无需人工判断下一步做什么。
-
-### 四个调度工具
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                   🧠 Orchestrator                        │
-│                                                         │
-│   ┌──────────────────┐    ┌──────────────────┐          │
-│   │ read_project_state│    │   read_file       │          │
-│   │ 读取项目进度JSON   │    │   读取项目文件     │          │
-│   └──────────────────┘    └──────────────────┘          │
-│                                                         │
-│   ┌──────────────────┐    ┌──────────────────┐          │
-│   │ route_to_agent    │    │  update_state     │          │
-│   │ 调度子Agent执行    │    │  更新项目状态      │          │
-│   │ 携带 plan 参数    │    │  持久化进度        │          │
-│   └──────────────────┘    └──────────────────┘          │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-### 一轮完整的调度循环
-
-```
-         ┌──────────────────────┐
-         │  用户输入              │
-         │  "我想做XX APP"       │
-         └──────────┬───────────┘
-                    ▼
-         ┌──────────────────────┐
-         │ Orchestrator:        │
-         │ read_project_state() │  ← 读取 project_state.json
-         │ 发现 PRD.md 不存在    │
-         └──────────┬───────────┘
-                    ▼
-         ┌──────────────────────┐
-         │ Orchestrator 输出:   │
-         │ 📊 状态摘要          │
-         │ 🗺️ 调度计划          │
-         │ → 路由到 Agent-PRD   │
-         └──────────┬───────────┘
-                    ▼
-         ┌──────────────────────┐
-         │ Orchestrator:        │
-         │ route_to_agent(      │  ← Tool Use 调用
-         │   "prd_expert",      │
-         │   task_description,  │
-         │   plan               │
-         │ )                    │
-         └──────────┬───────────┘
-                    ▼
-         ┌──────────────────────┐
-         │ Worker 执行:         │
-         │ 1. 加载 Agent 提示词  │
-         │ 2. 加载上下文文档     │
-         │ 3. 流式输出 PRD 文档  │
-         │ 4. 保存到 docs/PRD.md │
-         └──────────┬───────────┘
-                    ▼
-         ┌──────────────────────┐
-         │ Orchestrator:        │
-         │ update_state(        │  ← 记录完成状态
-         │   "prd_expert":      │
-         │   "completed"        │
-         │ )                    │
-         └──────────┬───────────┘
-                    ▼
-         ┌──────────────────────┐
-         │ ➡️ 下一步预告:        │
-         │ 技术架构师             │
-         │ (输入: docs/PRD.md)   │
-         └──────────────────────┘
-```
-
----
-
-## ⚡ 快速开始
-
-### 方式一：启动全生命周期编排系统（推荐）
+### The Full Pipeline (Recommended)
 
 ```bash
 git clone https://github.com/withai2025/agents.git
 cd agents/project-orchestrator
 
-# 安装依赖
 pip install -r requirements.txt
+cp .env.example .env   # add your ANTHROPIC_API_KEY
 
-# 配置
-cp .env.example .env
-# 编辑 .env，填入 ANTHROPIC_API_KEY
-
-# 启动
 python main.py
 ```
 
-```
-> 我想做一个跑步打卡 APP...
+```text
+> I want a calorie-tracking app with barcode scanning and meal logging...
 
-Orchestrator 自动依次调度：
-Agent-PRD → Agent-ARCH → Agent-STANDARDS → Agent-SCHEMA
-→ Agent-API → Agent-DECOMP → 进入编码执行阶段...
+The Orchestrator fires up and dispatches:
+  Agent-PRD → Agent-ARCH → Agent-STANDARDS → Agent-SCHEMA
+  → Agent-API → Agent-DECOMP → Coding begins...
 ```
 
-### 方式二：程序化调用单个 Agent
+### Individual Agent (Python Library)
 
 ```bash
 pip install -e .
@@ -348,78 +365,96 @@ pip install -e .
 ```python
 from agents import PRDExpert, MobileArchitect, TaskDecomposer
 
-# 单独调用任意 Agent
 prd = PRDExpert()
-result = prd.run("我想做一个跑步打卡APP，用户可以记录路线...")
+result = prd.run("I want to build a food delivery app for campus students...")
 print(result)
 ```
 
-### 方式三：CLI 命令行
+### CLI
 
 ```bash
-python -m agents.cli run prd-expert "帮我写一个外卖APP的PRD"
-python -m agents.cli run-stream task-decomposer "基于这些文档生成任务书"
-python -m agents.cli list  # 列出全部 Agent
+python -m agents.cli run prd-expert "Write a PRD for a pet adoption app"
+python -m agents.cli list                          # list all 10 agents
+python -m agents.cli run-stream task-decomposer "..."  # streaming mode
 ```
 
-### 方式四：Claude Code Skill
+### Claude Code Skill
 
-将 `skills/` 目录下的 `.md` 文件复制到你的 Claude Code skills 目录，即可在 Claude Code 对话中直接激活任意 Agent。
+Copy any `.md` file from `skills/` into your Claude Code skills directory. Activate it mid-conversation:
+
+```
+/activate prd-expert
+```
 
 ---
 
-## 🛡️ 失败处理与降级策略
+## 🛡️ Resilience: Graceful Degradation
 
-每个 Agent 最多重试 2 次。全部失败后不阻塞流程，执行降级：
+Every agent gets **2 retries**. If both fail, the pipeline doesn't stop—it degrades gracefully:
 
-| Agent | 失败降级策略 |
-|-------|-------------|
-| PRD 专家 | 最小 PRD：产品概述 + P0 功能列表 |
-| 技术架构师 | 默认技术栈：Expo + Supabase + Zustand + NativeWind |
-| 编码规范专家 | 最小规范集：命名规范 + 目录结构 + 禁用词列表 |
-| Schema 架构师 | 核心表：profiles + 1-2 张业务表 |
-| API 契约架构师 | 认证模块接口 + 最核心业务接口 |
-| 任务拆分专家 | 简化任务书：任务 ID + 名称 + 依赖关系 |
+| Agent | Degradation Strategy |
+|-------|---------------------|
+| PRD Expert | Minimal PRD: product overview + P0 feature list only |
+| Tech Architect | Default stack: Expo + Supabase + Zustand + NativeWind |
+| Coding Standards | Minimal rule set: naming conventions + directory tree + banned words |
+| Schema Architect | Core tables only: profiles + top 1-2 business tables |
+| API Contract | Auth endpoints + the single most critical business endpoint |
+| Task Decomposer | Simplified task book: task IDs + names + dependencies, no Claude Code prompts |
 
-降级版本在 `project_state.json` 中标记 `"degraded": true`，后续 Agent 基于降级版继续。
+Degraded outputs are marked `"degraded": true` in `project_state.json`. Downstream agents work with what's available—the assembly line keeps moving.
 
 ---
 
-## 📂 项目结构
+## 🚦 Conflict Resolution
+
+When documents disagree (e.g., a field name differs between Schema and API Contract):
 
 ```
-agents/
+Level 1: PRD           ← The final authority on feature behavior
+Level 2: Tech Arch     ← Architecture choices cannot be overridden downstream
+Level 3: Coding Standards ← Naming style takes precedence here
+Level 4: Schema        ← Field names are canonical from here
+Level 5: API Contract  ← Interface format follows from above
+```
+
+Process: identify conflict → consult the higher-level document → fix the lower-level document → log the decision in `project_state.json`. The LLM never decides which side "looks more reasonable."
+
+---
+
+## 📂 Repo Layout
+
+```
+agents/                                    # ← you are here
 │
-├── README.md                       # ← 你正在看的这个页面
-├── pyproject.toml                  # Python 库配置
+├── README.md                              # this page
+├── pyproject.toml                         # Python package config
 │
-├── 📦 src/agents/                  # Python 库（程序化调用）
-│   ├── _base.py                    # Agent 基类
-│   ├── prd_expert.py               # Agent 1-10 实现
-│   ├── ...                         #
-│   └── cli.py                      # CLI 入口（click）
+├── 📦 src/agents/                         # Python library (programmatic access)
+│   ├── _base.py                           # BaseAgent + AgentConfig
+│   ├── prd_expert.py .. orchestrator.py   # 10 agent implementations
+│   └── cli.py                             # click-based CLI
 │
-├── 🎛️ project-orchestrator/        # 编排系统（全生命周期调度）
-│   ├── README.md                   # 编排系统详细文档
-│   ├── main.py                     # CLI 交互式入口
-│   ├── orchestrator.py             # 总调度器（Tool Use 循环）
-│   ├── worker.py                   # 子 Agent 执行封装
-│   ├── state.py                    # JSON 状态机
-│   ├── config.py                   # 12 Agent 注册表 + 依赖解析
-│   ├── agents/                     # 13 个系统提示词 .md 文件
+├── ⚒️ project-orchestrator/               # The full assembly line
+│   ├── README.md                          # detailed orchestrator docs
+│   ├── main.py                            # interactive REPL entry point
+│   ├── orchestrator.py                    # Tool Use scheduling loop
+│   ├── worker.py                          # agent executor (stream + save)
+│   ├── state.py                           # JSON state machine
+│   ├── config.py                          # 12-agent registry + dep graph
+│   ├── agents/                            # 13 system prompt files (.md)
 │   │   ├── orchestrator.md
-│   │   ├── phase0/                 # 6 个文档生成专家
-│   │   └── phase1n/                # 6 个编码执行 Agent
-│   └── docs/                       # 文档输出目录（自动创建）
+│   │   ├── phase0/                        # 6 planning agent prompts
+│   │   └── phase1n/                       # 6 coding agent prompts
+│   └── docs/                              # auto-generated output documents
 │
-└── 📋 skills/                      # Claude Code Skill 文件
+└── 📋 skills/                             # Claude Code skill files (10 agents)
     ├── prd-expert.md
     ├── mobile-architect.md
-    └── ...（共 10 个）
+    └── ...
 ```
 
 ---
 
 ## 📄 License
 
-MIT
+MIT — forge away.
