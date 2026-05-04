@@ -67,7 +67,7 @@ graph TB
     P0_6 --> REVIEW0
 
     subgraph PHASE1["💻 PHASE 1-N — 构建阶段：6 个智能体，混合串并行"]
-        P1_DB["🗃️ Agent-DB<br/>数据库迁移"]
+        P1_DB["🗃️ Agent-DB<br/>建表与权限策略"]
         P1_FE["🎨 Agent-FE<br/>前端页面"]
         P1_BE["🔧 Agent-BE<br/>后端接口"]
         P1_CONNECT["🔗 Agent-CONNECT<br/>Mock → 真实 API"]

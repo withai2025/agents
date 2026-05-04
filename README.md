@@ -67,7 +67,7 @@ graph TB
     P0_6 --> REVIEW0
 
     subgraph PHASE1["💻 PHASE 1-N — Building: 6 Agents, Hybrid Parallel"]
-        P1_DB["🗃️ Agent-DB<br/>Run Migrations"]
+        P1_DB["🗃️ Agent-DB<br/>Create Tables + RLS"]
         P1_FE["🎨 Agent-FE<br/>Frontend Pages"]
         P1_BE["🔧 Agent-BE<br/>Backend APIs"]
         P1_CONNECT["🔗 Agent-CONNECT<br/>Mock → Real API"]
