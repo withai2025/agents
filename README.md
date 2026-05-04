@@ -41,6 +41,69 @@ YOU SAY:                          APPFORGE DELIVERS:
 
 ---
 
+## 🗺️ Pipeline at a Glance
+
+```mermaid
+graph TB
+    INPUT["💡 Your App Idea<br/><i>Just describe what you want to build</i>"]
+
+    ORCH["🧠 Orchestrator<br/><i>Reads state → Decides → Routes → Tracks</i>"]
+
+    INPUT --> ORCH
+
+    subgraph PHASE0["📋 PHASE 0 — Planning: 6 Agents, Strict Serial"]
+        P0_1["① 📝 PRD Expert<br/>Product Spec"] -->
+        P0_2["② 🏗️ Tech Architect<br/>Stack &amp; Structure"] -->
+        P0_3["③ 📏 Coding Standards<br/>Quality Rules"] -->
+        P0_4["④ 🗄️ Schema Architect<br/>Database Design"] -->
+        P0_5["⑤ 🔌 API Contract<br/>Interface Spec"] -->
+        P0_6["⑥ 📋 Task Decomposer<br/>Build Plan"]
+    end
+
+    ORCH --> P0_1
+
+    REVIEW0["🔍 Cross-Document Review<br/><i>Fresh context, catches inconsistencies</i>"]
+
+    P0_6 --> REVIEW0
+
+    subgraph PHASE1["💻 PHASE 1-N — Building: 6 Agents, Hybrid Parallel"]
+        P1_DB["🗃️ Agent-DB<br/>Run Migrations"]
+        P1_FE["🎨 Agent-FE<br/>Frontend Pages"]
+        P1_BE["🔧 Agent-BE<br/>Backend APIs"]
+        P1_CONNECT["🔗 Agent-CONNECT<br/>Mock → Real API"]
+        P1_VERIFY["✅ Agent-VERIFY<br/>Acceptance Tests"]
+        P1_FIX["🩹 Agent-FIX<br/>Patch Failures"]
+
+        P1_DB --> P1_FE
+        P1_DB --> P1_BE
+        P1_FE --> P1_CONNECT
+        P1_BE --> P1_CONNECT
+        P1_CONNECT --> P1_VERIFY
+        P1_VERIFY -- "fail" --> P1_FIX
+        P1_FIX --> P1_VERIFY
+    end
+
+    REVIEW0 --> P1_DB
+
+    REVIEW1["🔍 Milestone Review<br/><i>Fresh conversation, zero must-fix items</i>"]
+
+    P1_VERIFY -- "pass" --> REVIEW1
+
+    DONE["🚀 Complete, Runnable App<br/><i>Expo + Supabase · React Native</i>"]
+
+    REVIEW1 --> DONE
+
+    style INPUT fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style ORCH fill:#fff8e1,stroke:#f9a825,stroke-width:2px
+    style DONE fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
+    style PHASE0 fill:#f3e5f5,stroke:#7b1fa2
+    style PHASE1 fill:#e8eaf6,stroke:#283593
+    style REVIEW0 fill:#fce4ec,stroke:#c62828
+    style REVIEW1 fill:#fce4ec,stroke:#c62828
+```
+
+---
+
 ## 🎯 Why AppForge?
 
 | Instead of... | AppForge... |
