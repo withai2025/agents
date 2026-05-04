@@ -5,7 +5,7 @@
 > One sentence in → fully functional app out. No human coding required.
 
 <p align="center">
-  <b>🇬🇧 English</b> · <a href="README_CN.md">🇨🇳 中文</a>
+  <b>English</b> · <a href="README_CN.md">中文</a>
 </p>
 
 <p align="center">
@@ -358,6 +358,19 @@ python main.py
 The Orchestrator fires up and dispatches:
   Agent-PRD → Agent-ARCH → Agent-STANDARDS → Agent-SCHEMA
   → Agent-API → Agent-DECOMP → Coding begins...
+```
+
+### Notes for Users in China
+
+If GitHub is slow, use a mirror:
+```bash
+git clone https://ghproxy.com/https://github.com/withai2025/AppForge.git
+```
+
+Anthropic API requires a proxy or API forwarding service when accessed from mainland China. Set your proxy before running:
+```bash
+export HTTPS_PROXY=http://127.0.0.1:7890   # your proxy address
+python main.py
 ```
 
 ### Individual Agent (Python Library)

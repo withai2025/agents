@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">🇬🇧 English</a> · <b>🇨🇳 中文</b>
+  <a href="README.md">English</a> · <b>中文</b>
 </p>
 
 ---
@@ -360,6 +360,19 @@ python main.py
 Orchestrator 自动依次调度：
   Agent-PRD → Agent-ARCH → Agent-STANDARDS → Agent-SCHEMA
   → Agent-API → Agent-DECOMP → 进入编码执行阶段...
+```
+
+### 国内用户注意事项
+
+GitHub 克隆慢可使用镜像：
+```bash
+git clone https://ghproxy.com/https://github.com/withai2025/AppForge.git
+```
+
+Anthropic API 在国内需要代理访问，运行前设置：
+```bash
+export HTTPS_PROXY=http://127.0.0.1:7890   # 替换为你的代理地址
+python main.py
 ```
 
 ### 程序化调用单个 Agent（Python 库）
