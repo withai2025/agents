@@ -5,16 +5,18 @@
 > 一句话输入 → 完整 APP 输出。零人工编码。
 
 <p align="center">
-  <a href="https://github.com/withai2025/AppForge/stargazers"><img src="https://img.shields.io/github/stars/withai2025/AppForge?style=social" alt="GitHub stars"></a>
-  <a href="https://github.com/withai2025/AppForge/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="https://github.com/withAIx/AppForge/stargazers"><img src="https://img.shields.io/github/stars/withAIx/AppForge?style=social" alt="GitHub stars"></a>
+  <a href="https://github.com/withAIx/AppForge/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python 3.11+"></a>
   <a href="https://github.com/anthropics/anthropic-sdk-python"><img src="https://img.shields.io/badge/Anthropic%20SDK-0.40+-green.svg" alt="Anthropic SDK"></a>
-  <a href="https://github.com/withai2025/AppForge/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+  <a href="https://github.com/withAIx/AppForge/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
 </p>
 
 <p align="center">
   <a href="README.md">English</a> · <b>中文</b>
 </p>
+
+> 💡 **寻找 DeepSeek V4 版本？** → [DeepSeek-AppForge](https://github.com/withAIx/DeepSeek-AppForge)
 
 ---
 
@@ -345,7 +347,7 @@ Orchestrator 通过 Anthropic **Tool Use** 实现全自动调度决策，无需�
 ### 完整流水线（推荐）
 
 ```bash
-git clone https://github.com/withai2025/AppForge.git
+git clone https://github.com/withAIx/AppForge.git
 cd AppForge/project-orchestrator
 
 pip install -r requirements.txt
@@ -366,7 +368,7 @@ Orchestrator 自动依次调度：
 
 GitHub 克隆慢可使用镜像：
 ```bash
-git clone https://ghproxy.com/https://github.com/withai2025/AppForge.git
+git clone https://ghproxy.com/https://github.com/withAIx/AppForge.git
 ```
 
 Anthropic API 在国内需要代理访问，运行前设置：
