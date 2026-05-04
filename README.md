@@ -63,8 +63,8 @@ YOU SAY:                          APPFORGE DELIVERS:
               │               │               │
               ▼               ▼               ▼
      ┌─────────────────────────────────────────────────┐
-     │              🧠 Orchestrator                     │
-     │         Claude Opus 4.7/4.6 + Tool Use               │
+     │              🧠 Orchestrator                    │
+     │         Claude Opus 4.7/4.6 + Tool Use          │
      │                                                 │
      │   Reads project_state.json → Decides next step  │
      │            → Routes to correct agent            │
