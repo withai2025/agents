@@ -48,6 +48,7 @@ Copy the corresponding `.md` file from `skills/` into your Claude Code skills di
 | 6 | CodingStandards | 编码规范专家，从 PRD+技术方案生成 CODING_STANDARDS.md 与 Cursor Prompt 模板 |
 | 7 | DBSchemaArchitect | 数据库 Schema 架构师，生成 PostgreSQL/SQLite/ER图/RLS/同步策略完整设计 |
 | 8 | APIContractArchitect | API 接口契约架构师，生成完整 API 契约文档含 TypeScript 类型/SSE/幂等/请求函数模板 |
+| 9 | TaskDecomposer | 编码任务拆分专家，将全套文档拆解为分阶段任务书含依赖图/Claude Code指令/验收标准 |
 
 ## License
 
