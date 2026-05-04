@@ -47,6 +47,7 @@ Copy the corresponding `.md` file from `skills/` into your Claude Code skills di
 | 5 | MobileArchitect | 移动端技术架构师，从 PRD 到可执行技术方案，涵盖技术选型/数据库/AI集成 |
 | 6 | CodingStandards | 编码规范专家，从 PRD+技术方案生成 CODING_STANDARDS.md 与 Cursor Prompt 模板 |
 | 7 | DBSchemaArchitect | 数据库 Schema 架构师，生成 PostgreSQL/SQLite/ER图/RLS/同步策略完整设计 |
+| 8 | APIContractArchitect | API 接口契约架构师，生成完整 API 契约文档含 TypeScript 类型/SSE/幂等/请求函数模板 |
 
 ## License
 
