@@ -4,13 +4,13 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
-[![DeepSeek SDK](https://img.shields.io/badge/DeepSeek%20SDK-0.40+-green.svg)](https://github.com/openais/openai-sdk-python)
+[![Anthropic SDK](https://img.shields.io/badge/Anthropic%20SDK-0.40+-green.svg)](https://github.com/anthropics/anthropic-sdk-python)
 
 ---
 
 ## 🤔 这是什么？
 
-**Project Orchestrator** 是一个基于 DeepSeek Claude 的 Orchestrator-Workers 架构系统，
+**Project Orchestrator** 是一个基于 Anthropic Claude 的 Orchestrator-Workers 架构系统，
 将「我有一个 APP 想法」这一句话，转化为一个**完整可运行的 APP**。
 
 它不是单个 AI Agent，而是一个**编排 13 个专业 AI Agent 的总调度系统**。每个 Agent 都拥有经过精心设计的系统提示词、明确的输入/输出契约、以及校验门禁。
@@ -26,7 +26,7 @@
 | 🧭 **全生命周期管理** | 从产品构想 → 六份规划文档 → 编码执行 → 验收交付，一站式覆盖 |
 | 🔗 **严格串行链** | Phase 0 六步文档生成严格有序，每步产出是下一步的输入 |
 | ⚡ **混合串并行** | Phase 1-N 编码阶段自动识别可并行任务，最大化执行效率 |
-| 🔧 **Tool Use 调度** | Orchestrator 通过 DeepSeek Tool Use 机制动态路由子 Agent |
+| 🔧 **Tool Use 调度** | Orchestrator 通过 Anthropic Tool Use 机制动态路由子 Agent |
 | 📊 **状态持久化** | JSON 文件记录每个任务的进度、重试次数、降级标记 |
 | 🛡️ **三层验证** | 执行前审查 → 节点级输出校验 → 里程碑独立审查 |
 | 🔄 **失败降级** | 每个 Agent 最多重试 2 次，失败后自动降级、不阻塞流程 |
@@ -38,7 +38,7 @@
 ```
                           ┌──────────────────────────┐
                           │    🧠 Orchestrator        │
-                          │   (DeepSeek V4 Pro 4.7)       │
+                          │   (Claude Opus 4.7)       │
                           │                          │
                           │  Tool Use 驱动调度决策     │
                           │  自动判断当前阶段/下一步    │
@@ -115,7 +115,7 @@ TASK_BOOK.md
 
 | Agent | 模型 | 职责 |
 |-------|------|------|
-| 🎛️ Orchestrator | DeepSeek V4 Pro 4.7 | 读取项目状态、动态路由子 Agent、管理串并行决策 |
+| 🎛️ Orchestrator | Claude Opus 4.7 | 读取项目状态、动态路由子 Agent、管理串并行决策 |
 
 ### 📋 Phase 0：规划专家团队（6 人，严格串行）
 
@@ -160,16 +160,16 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# 编辑 .env，填入你的 DEEPSEEK_API_KEY
+# 编辑 .env，填入你的 ANTHROPIC_API_KEY
 ```
 
 `.env` 内容：
 
 ```env
-DEEPSEEK_API_KEY=sk-ant-...
-ORCHESTRATOR_MODEL=deepseek-v4-pro    # 总调度器模型
-WORKER_MODEL_HEAVY=deepseek-v4-pro    # 文档生成 Agent 模型
-WORKER_MODEL_LIGHT=deepseek-v4-flash   # 编码执行 Agent 模型
+ANTHROPIC_API_KEY=sk-ant-...
+ORCHESTRATOR_MODEL=claude-opus-4-7    # 总调度器模型
+WORKER_MODEL_HEAVY=claude-opus-4-7    # 文档生成 Agent 模型
+WORKER_MODEL_LIGHT=claude-sonnet-4-6   # 编码执行 Agent 模型
 PROJECT_NAME=my_app                    # 项目名称
 ```
 
@@ -257,7 +257,7 @@ Orchestrator-Workers APP 全生命周期开发编排系统
 project-orchestrator/
 │
 ├── main.py                  # CLI 交互式入口（REPL 循环）
-├── orchestrator.py          # 总调度器（DeepSeek Tool Use 循环）
+├── orchestrator.py          # 总调度器（Anthropic Tool Use 循环）
 ├── worker.py                # 子 Agent 执行封装（流式 + 保存）
 ├── state.py                 # JSON 状态机（进度追踪 + 重试/降级）
 ├── config.py                # 12 Agent 注册表 + 依赖解析
@@ -289,7 +289,7 @@ project-orchestrator/
 
 ## 🎛️ Orchestrator 的 Tool Use 机制
 
-Orchestrator 通过 DeepSeek 原生 Tool Use 实现调度决策。它拥有 4 个工具：
+Orchestrator 通过 Anthropic 原生 Tool Use 实现调度决策。它拥有 4 个工具：
 
 | Tool | 用途 | 调用时机 |
 |------|------|---------|

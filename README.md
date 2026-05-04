@@ -8,14 +8,14 @@
   <b>English</b> · <a href="README_CN.md">中文</a>
 </p>
 
-> 💡 **Looking for the Claude (Anthropic) version?** → [AppForge](https://github.com/withAIx/AppForge)
+> 💡 **Looking for the DeepSeek V4 version?** → [DeepSeek-AppForge](https://github.com/withAIx/DeepSeek-AppForge)
 
 <p align="center">
-  <a href="https://github.com/withAIx/DeepSeek-AppForge/stargazers"><img src="https://img.shields.io/github/stars/withAIx/DeepSeek-AppForge?style=social" alt="GitHub stars"></a>
-  <a href="https://github.com/withAIx/DeepSeek-AppForge/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="https://github.com/withAIx/AppForge/stargazers"><img src="https://img.shields.io/github/stars/withAIx/AppForge?style=social" alt="GitHub stars"></a>
+  <a href="https://github.com/withAIx/AppForge/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python 3.11+"></a>
-  <a href="https://github.com/openai/openai-python"><img src="https://img.shields.io/badge/OpenAI%20SDK-1.0+-green.svg" alt="OpenAI SDK (DeepSeek compatible)"></a>
-  <a href="https://github.com/withAIx/DeepSeek-AppForge/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+  <a href="https://github.com/anthropics/anthropic-sdk-python"><img src="https://img.shields.io/badge/Anthropic%20SDK-0.40+-green.svg" alt="Anthropic SDK"></a>
+  <a href="https://github.com/withAIx/AppForge/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
 </p>
 
 ---
@@ -54,44 +54,6 @@ YOU SAY:                          APPFORGE DELIVERS:
 
 ---
 
-## 🚀 Powered by DeepSeek V4
-
-AppForge is built entirely on the **DeepSeek V4 model family**, delivering unparalleled performance at a fraction of the cost.
-
-### Why DeepSeek?
-
-| Capability | DeepSeek V4 Pro | Claude Opus 4.6 | Advantage |
-|-----------|----------------|---------------|-----------|
-| Context window | **1,000,000 tokens** | 200,000 tokens | 5x larger — load all 6 planning docs in one prompt |
-| Input price (per 1M tokens) | **$1.74** | $15.00 | 8.6x cheaper |
-| Output price (per 1M tokens) | **$3.48** | $75.00 | 21.5x cheaper |
-| Thinking mode | **thinking / thinking_max** | Extended thinking | Fine-grained control per agent |
-| Prefix caching | **Automatic (80-92% discount)** | Manual | Phase 0 serial chain: ~60% cost savings |
-| Chinese language | **Native-level** | Good | System prompts are primarily Chinese |
-
-### Smart Model Routing
-
-Not every task needs a heavyweight model. AppForge assigns models intelligently:
-
-| Tier | Model | Thinking Mode | Agents | Use Case |
-|------|-------|--------------|--------|----------|
-| Heavy | `deepseek-v4-pro` | `thinking_max` | PRD Expert, Schema Architect, API Contract, Task Decomposer | Complex reasoning, multi-document synthesis |
-| Standard | `deepseek-v4-pro` | `thinking` | Orchestrator, Tech Architect, Coding Standards, Agent-BE, Agent-FE, Agent-FIX | Architecture decisions, code generation |
-| Light | `deepseek-v4-flash` | `non-thinking` | Agent-DB, Agent-CONNECT, Agent-VERIFY | Mechanical SQL/field mapping/validation |
-
-### DeepSeek-Exclusive Features
-
-**1M Context Cross-Document Review**
-After all 6 planning documents are generated, `cross_doc_checker.py` loads **every document into a single API call** and performs a holistic consistency audit — catching field name mismatches, schema-API inconsistencies, and logic contradictions across the entire doc set. Impossible on a 200K context window.
-
-**Automatic Prefix Caching**
-DeepSeek caches repeated prompt prefixes at block boundaries automatically. Phase 0's serial chain (where each agent loads the previous agent's output) sees **80-92% cache hit rates**, cutting prompt costs by ~60%. The `prefix_cache_utils.py` helper structures messages to maximize cache overlap.
-
-**Reasoning Content Streaming**
-When `thinking` mode is enabled, DeepSeek returns `delta.reasoning_content` (the model's internal chain of thought) alongside `delta.content` (visible output). The Orchestrator displays its reasoning so you can understand why it made each scheduling decision.
-
----
-
 ## 🏗️ Architecture
 
 ### The Assembly Line
@@ -103,8 +65,8 @@ When `thinking` mode is enabled, DeepSeek returns `delta.reasoning_content` (the
               │               │               │
               ▼               ▼               ▼
      ┌─────────────────────────────────────────────────┐
-     │              🧠 Orchestrator                     │
-     │         DeepSeek V4 Pro + Function Calling             │
+     │              🧠 Orchestrator                    │
+     │         Claude Opus 4.7/4.6 + Tool Use          │
      │                                                 │
      │   Reads project_state.json → Decides next step  │
      │            → Routes to correct agent            │
@@ -278,7 +240,7 @@ TASK_BOOK.md
 
 | Agent | Model | Role |
 |-------|-------|------|
-| 🧠 **Orchestrator** | DeepSeek V4 Pro + thinking | Reads project state → decides next agent → dispatches via Function Calling → updates progress |
+| 🧠 **Orchestrator** | Claude Opus 4.7 | Reads project state → decides next agent → dispatches via Tool Use → updates progress |
 
 ### 📋 Phase 0: The Planning Crew (strict serial, 6 agents)
 
@@ -306,7 +268,7 @@ TASK_BOOK.md
 
 ## 🎛️ The Orchestrator's Tool Belt
 
-The Orchestrator doesn't guess—it uses 4 Function Calling tools to make data-driven scheduling decisions:
+The Orchestrator doesn't guess—it uses 4 Anthropic Tool Use functions to make data-driven scheduling decisions:
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -351,7 +313,7 @@ User: "I want to build a running tracker app..."
 └──────────────┬───────────────┘
                ▼
 ┌──────────────────────────────┐
-│ Function Calling: route_to_agent(    │
+│ Tool Use: route_to_agent(    │
 │   agent="prd_expert",        │
 │   task="Generate PRD for     │
 │         running tracker...", │
@@ -383,11 +345,11 @@ User: "I want to build a running tracker app..."
 ### The Full Pipeline (Recommended)
 
 ```bash
-git clone https://github.com/withAIx/DeepSeek-AppForge.git
+git clone https://github.com/withAIx/AppForge.git
 cd AppForge/project-orchestrator
 
 pip install -r requirements.txt
-cp .env.example .env   # add your DEEPSEEK_API_KEY
+cp .env.example .env   # add your ANTHROPIC_API_KEY
 
 python main.py
 ```
@@ -404,10 +366,10 @@ The Orchestrator fires up and dispatches:
 
 If GitHub is slow, use a mirror:
 ```bash
-git clone https://ghproxy.com/https://github.com/withAIx/DeepSeek-AppForge.git
+git clone https://ghproxy.com/https://github.com/withAIx/AppForge.git
 ```
 
-DeepSeek API requires a proxy or API forwarding service when accessed from mainland China. Set your proxy before running:
+Anthropic API requires a proxy or API forwarding service when accessed from mainland China. Set your proxy before running:
 ```bash
 export HTTPS_PROXY=http://127.0.0.1:7890   # your proxy address
 python main.py
@@ -494,7 +456,7 @@ AppForge/                                  # ← you are here
 ├── ⚒️ project-orchestrator/               # The full assembly line
 │   ├── README.md                          # detailed orchestrator docs
 │   ├── main.py                            # interactive REPL entry point
-│   ├── orchestrator.py                    # Function Calling scheduling loop
+│   ├── orchestrator.py                    # Tool Use scheduling loop
 │   ├── worker.py                          # agent executor (stream + save)
 │   ├── state.py                           # JSON state machine
 │   ├── config.py                          # 12-agent registry + dep graph
