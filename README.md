@@ -26,9 +26,9 @@ No more piecemeal AI coding assistants. AppForge runs the entire **product lifec
 
 ```
 YOU SAY:                          APPFORGE DELIVERS:
-"我想做一个跑步打卡APP，           ✅ docs/PRD.md          (9-chapter product spec)
- 可以记录路线、配速、               ✅ docs/TECH_ARCHITECTURE (tech stack, directory tree)
- 消耗卡路里，加好友PK"             ✅ docs/CODING_STANDARDS (DO/DON'T code rules)
+"I want a running tracker app      ✅ docs/PRD.md          (9-chapter product spec)
+ that logs routes, pace,           ✅ docs/TECH_ARCHITECTURE (tech stack, directory tree)
+ calories, and friend PvP"         ✅ docs/CODING_STANDARDS (DO/DON'T code rules)
                                    ✅ docs/DB_SCHEMA        (ER diagram, SQL, RLS)
                                    ✅ docs/API_CONTRACT     (endpoints, types, error codes)
                                    ✅ docs/TASK_BOOK        (phased task plan, Mock strategy)
