@@ -5,6 +5,10 @@
 > One sentence in → fully functional app out. No human coding required.
 
 <p align="center">
+  <b>🇬🇧 English</b> · <a href="README_CN.md">🇨🇳 中文</a>
+</p>
+
+<p align="center">
   <a href="https://github.com/withai2025/agents/stargazers"><img src="https://img.shields.io/github/stars/withai2025/agents?style=social" alt="GitHub stars"></a>
   <a href="https://github.com/withai2025/agents/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python 3.11+"></a>
@@ -424,7 +428,7 @@ Process: identify conflict → consult the higher-level document → fix the low
 ## 📂 Repo Layout
 
 ```
-agents/                                    # ← you are here
+AppForge/                                  # ← you are here
 │
 ├── README.md                              # this page
 ├── pyproject.toml                         # Python package config
