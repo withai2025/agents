@@ -45,61 +45,61 @@ YOU SAY:                          APPFORGE DELIVERS:
 
 ```mermaid
 graph TB
-    INPUT["💡 Your App Idea<br/><i>Just describe what you want to build</i>"]
-
-    ORCH["🧠 Orchestrator<br/><i>Reads state → Decides → Routes → Tracks</i>"]
+    INPUT["💡 Your App Idea<br/><i>Describe what you want in plain language</i>"]
 
     INPUT --> ORCH
 
-    subgraph PHASE0["📋 PHASE 0 — Planning: 6 Agents, Strict Serial"]
-        P0_1["① 📝 PRD Expert<br/>Product Spec"] -->
-        P0_2["② 🏗️ Tech Architect<br/>Stack &amp; Structure"] -->
-        P0_3["③ 📏 Coding Standards<br/>Quality Rules"] -->
-        P0_4["④ 🗄️ Schema Architect<br/>Database Design"] -->
-        P0_5["⑤ 🔌 API Contract<br/>Interface Spec"] -->
-        P0_6["⑥ 📋 Task Decomposer<br/>Build Plan"]
-    end
+    MEMORY["🗄️ Memory<br/>External Memory Files<br/><i>State · Progress · Decisions · Long-term</i>"]
+    ORCH["🧠 Orchestrator<br/><i>Read state → Decide next → Route → Track progress</i>"]
+    MEMORY -. "read" .-> ORCH
+    ORCH -. "update" .-> MEMORY
 
     ORCH --> P0_1
 
-    REVIEW0["🔍 Cross-Document Review<br/><i>Fresh context, catches inconsistencies</i>"]
+    subgraph PHASE0["📋 PHASE 0 — Planning: 6 Agents, Strict Serial"]
+        direction LR
+        P0_1["① 📝<br/>Product Designer<br/><i>→ PRD</i>"]
+        P0_2["② 🏗️<br/>Tech Architect<br/><i>→ Tech Spec</i>"]
+        P0_3["③ 📏<br/>Standards Expert<br/><i>→ Coding Standards</i>"]
+        P0_4["④ 🗄️<br/>DB Design Expert<br/><i>→ DB Schema</i>"]
+        P0_5["⑤ 🔌<br/>API Design Expert<br/><i>→ API Contract</i>"]
+        P0_6["⑥ 📋<br/>Task Decomposer<br/><i>→ Task Book</i>"]
+        P0_1 --> P0_2 --> P0_3 --> P0_4 --> P0_5 --> P0_6
+    end
 
-    P0_6 --> REVIEW0
+    P0_6 --> REVIEW0["🔍 Planning Review<br/><i>Fresh conversation · No context bias</i>"]
+
+    REVIEW0 --> P1_DB
 
     subgraph PHASE1["💻 PHASE 1-N — Building: 6 Agents, Hybrid Parallel"]
         P1_DB["🗃️ Agent-DB<br/>Create Tables + RLS"]
-        P1_FE["🎨 Agent-FE<br/>Frontend Pages"]
-        P1_BE["🔧 Agent-BE<br/>Backend APIs"]
+        P1_FE["🎨 Agent-FE<br/>Frontend Pages + Mock"]
+        P1_BE["🔧 Agent-BE<br/>Backend Edge Functions"]
         P1_CONNECT["🔗 Agent-CONNECT<br/>Mock → Real API"]
         P1_VERIFY["✅ Agent-VERIFY<br/>Acceptance Tests"]
-        P1_FIX["🩹 Agent-FIX<br/>Patch Failures"]
+        P1_FIX["🩹 Agent-FIX<br/>Targeted Patches"]
 
         P1_DB --> P1_FE
         P1_DB --> P1_BE
         P1_FE --> P1_CONNECT
         P1_BE --> P1_CONNECT
         P1_CONNECT --> P1_VERIFY
-        P1_VERIFY -- "fail" --> P1_FIX
+        P1_VERIFY -- "❌ fail" --> P1_FIX
         P1_FIX --> P1_VERIFY
     end
 
-    REVIEW0 --> P1_DB
+    P1_VERIFY -- "✅ pass" --> REVIEW1["🔍 Milestone Review<br/><i>Fresh conversation · Zero must-fix items</i>"]
 
-    REVIEW1["🔍 Milestone Review<br/><i>Fresh conversation, zero must-fix items</i>"]
-
-    P1_VERIFY -- "pass" --> REVIEW1
-
-    DONE["🚀 Complete, Runnable App<br/><i>Expo + Supabase · React Native</i>"]
-
-    REVIEW1 --> DONE
+    REVIEW1 --> DONE["🚀 Complete, Runnable App<br/><i>React Native · Expo + Supabase · Full-stack delivery</i>"]
 
     style INPUT fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
-    style ORCH fill:#fff8e1,stroke:#f9a825,stroke-width:2px
-    style DONE fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
-    style PHASE0 fill:#f3e5f5,stroke:#7b1fa2
-    style PHASE1 fill:#e8eaf6,stroke:#283593
-    style REVIEW0 fill:#fce4ec,stroke:#c62828
-    style REVIEW1 fill:#fce4ec,stroke:#c62828
+    style MEMORY fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px
+    style ORCH fill:#fff7ed,stroke:#f97316,stroke-width:2px
+    style PHASE0 fill:#f3e8ff,stroke:#9333ea,stroke-width:2px
+    style PHASE1 fill:#e0e7ff,stroke:#4f46e5,stroke-width:2px
+    style REVIEW0 fill:#fce7f3,stroke:#db2777,stroke-width:1.5px
+    style REVIEW1 fill:#fce7f3,stroke:#db2777,stroke-width:1.5px
+    style DONE fill:#d1fae5,stroke:#059669,stroke-width:3px
 ```
 
 ---
