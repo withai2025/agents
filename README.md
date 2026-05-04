@@ -1,56 +1,425 @@
-# Agents
+# 🚀 Agents — AI 智能体编排系统
 
-A collection of well-crafted AI agents powered by Claude. Each agent features a meticulously designed system prompt, supports both programmatic invocation and Claude Code Skill format, and is ready to drop into your projects.
+> **从「我有一个 APP 想法」到完整可运行 APP，全生命周期 AI 驱动**
 
-## Installation
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
+[![Anthropic SDK](https://img.shields.io/badge/Anthropic%20SDK-0.40+-green.svg)](https://github.com/anthropics/anthropic-sdk-python)
+
+---
+
+## 🤔 这是什么？
+
+一个基于 **Anthropic Claude** 的智能体集合 + 编排系统。包含两个核心组件：
+
+| 组件 | 路径 | 用途 |
+|------|------|------|
+| 🎛️ **Project Orchestrator** | `project-orchestrator/` | 13 智能体全生命周期编排系统，从产品构想自动推进到完整 APP |
+| 📦 **Agents Python 库** | `src/agents/` | 单个 Agent 的程序化调用 + CLI + Claude Code Skill 格式 |
+
+> 想象你有一个 13 人的全栈开发团队——1 个项目经理 + 6 个规划专家 + 6 个执行工程师。你只需说「我想做一个跑步打卡 APP」，整个团队自动运转。
+
+---
+
+## 🏗️ 全生命周期调度架构
+
+### 总览：两阶段流水线
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│   💬 用户构想                 🎛️ Orchestrator                   🎉 完整 APP   │
+│   "我想做XX APP"    ──────────────────────────▶    交付           │
+│                         │                            ▲           │
+│                         │  Tool Use 动态调度          │           │
+│                         ▼                            │           │
+│              ┌─────────────────────┐                  │           │
+│              │   Phase 0 (严格串行)  │                  │           │
+│              │   ① → ② → ③ → ④ → ⑤ → ⑥  │              │           │
+│              │   六份规划文档自动生成    │                  │           │
+│              └──────────┬──────────┘                  │           │
+│                         │                            │           │
+│                         ▼                            │           │
+│              ┌─────────────────────┐                  │           │
+│              │  Phase 1-N (混合串并行)│ ─────────────────┘           │
+│              │  DB │ FE║BE │ CONNECT │                              │
+│              │     VERIFY → FIX      │                              │
+│              └─────────────────────┘                                │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### Phase 0 详细流程：文档生成串行链
+
+每步的输出是下一步的输入，严格有序，不可并行：
+
+```
+┌───────────────┐
+│  用户构想      │  "我想做一个跑步打卡APP，可以记录路线、配速、
+│  (一句话即可)  │   消耗卡路里，还能加好友互相PK"
+└───────┬───────┘
+        │
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  ① 📝 Agent-PRD：PRD 专家                      ║
+║     输入：用户构想                                           ║
+║     产出：docs/PRD.md（9 章节，含用户角色/功能模块/验收标准）    ║
+║     校验：✅ Given-When-Then 验收标准  ✅ 无模糊禁用词         ║
+╚══════════════════════════════════════════════════════════════╝
+        │
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  ② 🏗️ Agent-ARCH：技术架构师                     ║
+║     输入：docs/PRD.md                                       ║
+║     产出：docs/TECH_ARCHITECTURE.md                         ║
+║     内容：技术选型对比(2+方案) / 目录结构 / MVP阶段 / 环境搭建 ║
+║     校验：✅ 每个选型有对比表格  ✅ 零经验可跟随的环境搭建步骤   ║
+╚══════════════════════════════════════════════════════════════╝
+        │
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  ③ 📏 Agent-STANDARDS：编码规范专家                ║
+║     输入：docs/PRD.md + docs/TECH_ARCHITECTURE.md           ║
+║     产出：docs/CODING_STANDARDS.md（13 章节）                 ║
+║     内容：命名规范/组件规范/Store规范/Service规范/Cursor模板   ║
+║     校验：✅ DO/DON'T 代码示例  ✅ 与技术方案目录结构一致      ║
+╚══════════════════════════════════════════════════════════════╝
+        │
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  ④ 🗄️ Agent-SCHEMA：Schema 架构师                 ║
+║     输入：PRD + 技术方案 + 编码规范（3 份文档）                 ║
+║     产出：docs/DB_SCHEMA.md                                  ║
+║     内容：ER图(Mermaid) / PostgreSQL DDL / SQLite DDL /      ║
+║           RLS策略 / 索引策略 / Redis缓存键 / 同步策略          ║
+║     校验：✅ 每表可追溯PRD原文  ✅ SQL可直接执行 无占位符      ║
+╚══════════════════════════════════════════════════════════════╝
+        │
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  ⑤ 🔌 Agent-API：API 契约架构师                   ║
+║     输入：PRD + 技术方案 + 编码规范 + Schema（4 份文档）       ║
+║     产出：docs/API_CONTRACT.md                               ║
+║     内容：错误码体系 / 鉴权分级 / TypeScript类型 /            ║
+║           分页规范 / 文件上传 / 弱网容错 / 请求函数模板          ║
+║     校验：✅ PRD每个操作有对应接口  ✅ 字段名与Schema完全一致   ║
+╚══════════════════════════════════════════════════════════════╝
+        │
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  ⑥ 📋 Agent-DECOMP：任务拆分专家                   ║
+║     输入：全部五份文档                                         ║
+║     产出：docs/TASK_BOOK.md                                  ║
+║     内容：依赖图(Mermaid) / 每任务文件清单 / Mock方案 /         ║
+║           零代码验收标准 / 可复制Claude Code指令                ║
+║     校验：✅ 每页面有对应任务  ✅ 验收标准全是终端命令          ║
+╚══════════════════════════════════════════════════════════════╝
+        │
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  🔍 Agent-REVIEW：独立审查（新对话，全新视角）                 ║
+║     检查：6 份文档交叉一致性 / 可操作性 / 完整性                ║
+║     输出：必须修复项 / 建议修复项 / 可忽略项 / 评分 1-10        ║
+╚══════════════════════════════════════════════════════════════╝
+        │
+        │  审查通过 ✅
+        ▼
+   进入 Phase 1-N 编码执行
+```
+
+### Phase 1-N 详细流程：编码执行混合串并行
+
+```
+docs/TASK_BOOK.md
+        │
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  Phase 1：基础设施链（强制串行）                              ║
+║                                                              ║
+║  T00 ──▶ T01 ──▶ T02 ──▶ T03 ──▶ T04                       ║
+║  项目    基础    全局    请求    基础                          ║
+║  初始化  配置    类型    封装    UI组件                         ║
+╚══════════════════════════════════════════════════════════════╝
+        │
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  Phase 2：认证模块                                            ║
+║                                                              ║
+║  T05 (Auth Store) ──▶ T06 (注册页) ║ T07 (登录页)            ║
+║                            │                                  ║
+║                            ▼                                  ║
+║                    T08 (Auth Edge Function)                  ║
+║                            │                                  ║
+║                            ▼                                  ║
+║                    T06 + T07 替换 Mock → 真实 API             ║
+╚══════════════════════════════════════════════════════════════╝
+        │
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  Phase 3+：核心功能（前后端可并行）                            ║
+║                                                              ║
+║                   ┌──────────────┐                            ║
+║                   │  🗃️ Agent-DB  │                            ║
+║                   │  数据库迁移    │                            ║
+║                   └──────┬───────┘                            ║
+║                          │                                    ║
+║            ┌─────────────┼─────────────┐                      ║
+║            ▼             ▼             ▼                      ║
+║   ┌────────────┐ ┌────────────┐ ┌────────────┐                ║
+║   │ 🎨 Agent-FE │ │ 🔧 Agent-BE │ │ 🎨 Agent-FE │  ← 可并行   ║
+║   │  首页Feed   │ │  Post接口   │ │  发帖页面   │              ║
+║   │  (含Mock)   │ │             │ │  (含Mock)   │              ║
+║   └─────┬──────┘ └──────┬─────┘ └─────┬──────┘                ║
+║         │               │             │                        ║
+║         └───────────────┼─────────────┘                        ║
+║                         ▼                                      ║
+║                 ┌──────────────┐                               ║
+║                 │ 🔗 CONNECT    │  前后端联调                    ║
+║                 │  Mock→真实API │                               ║
+║                 └──────┬───────┘                               ║
+║                        ▼                                       ║
+║                 ┌──────────────┐                               ║
+║                 │ ✅ VERIFY     │  验收测试                      ║
+║                 └──┬───────┬───┘                               ║
+║                    │       │                                   ║
+║               通过 ✅   失败 ❌                                  ║
+║                    │       ▼                                   ║
+║                    │  ┌──────────┐                              ║
+║                    │  │ 🩹 FIX    │  修复 → 重新验收             ║
+║                    │  └──────────┘                              ║
+║                    ▼       │                                   ║
+║                下一个任务 ◀─┘                                   ║
+╚══════════════════════════════════════════════════════════════╝
+        │
+        │  所有任务完成
+        ▼
+╔══════════════════════════════════════════════════════════════╗
+║  🔍 Agent-REVIEW：里程碑独立审查（新对话）                     ║
+║     无"必须修复"项 → 🎉 完整可运行的 APP                       ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## 👥 13 智能体全名册
+
+### 🎛️ 总调度器
+
+| Agent | 模型 | 核心职责 |
+|-------|------|---------|
+| 🧠 **Orchestrator** | Claude Opus 4.7 | 读取项目状态 → 分析下一步 → Tool Use 动态路由子 Agent → 更新进度 |
+
+### 📋 Phase 0：规划专家团队（严格串行，6 人）
+
+| # | Agent | 产出文档 | 依赖 | 一句话 |
+|---|-------|---------|------|--------|
+| 1 | 📝 PRD 专家 | `docs/PRD.md` | 用户构想 | 模糊想法 → 9 章节结构化 PRD，Given-When-Then 验收标准 |
+| 2 | 🏗️ 技术架构师 | `docs/TECH_ARCHITECTURE.md` | PRD | 技术选型对比 + 目录结构 + MVP 路径 + 环境搭建 |
+| 3 | 📏 编码规范专家 | `docs/CODING_STANDARDS.md` | 技术方案 | 13 章编码规范，DO/DON'T 示例，Cursor Prompt 模板 |
+| 4 | 🗄️ Schema 架构师 | `docs/DB_SCHEMA.md` | 编码规范 | ER 图 + PostgreSQL/SQLite DDL + RLS + 同步策略 |
+| 5 | 🔌 API 契约架构师 | `docs/API_CONTRACT.md` | Schema | API 定义 + TS 类型 + 错误码 + 鉴权分级 + 弱网容错 |
+| 6 | 📋 任务拆分专家 | `docs/TASK_BOOK.md` | 全部五文档 | 分阶段任务书 + 依赖图 + Mock 策略 + Claude Code 指令 |
+
+### 💻 Phase 1-N：编码执行团队（混合串并行，6 人）
+
+| Agent | 触发条件 | 产出 |
+|-------|---------|------|
+| 🗃️ **Agent-DB** | 任务书数据库迁移任务 | Supabase 建表 SQL + RLS 策略 |
+| 🔧 **Agent-BE** | 后端 Edge Function 任务 | TypeScript Edge Function 代码 |
+| 🎨 **Agent-FE** | 前端页面/组件任务 | React Native 页面 + Mock 数据 + TODO 注释 |
+| 🔗 **Agent-CONNECT** | 前后端均已完成 | Mock 替换为真实 API 调用 |
+| ✅ **Agent-VERIFY** | 任意编码任务完成后 | 逐条验收报告（✅ 通过 / ❌ 未通过） |
+| 🩹 **Agent-FIX** | 编译报错、验收失败 | 精确到行号的修复方案 |
+
+---
+
+## 🎛️ Orchestrator 调度机制
+
+Orchestrator 通过 Anthropic **Tool Use** 实现全自动调度决策，无需人工判断下一步做什么。
+
+### 四个调度工具
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                   🧠 Orchestrator                        │
+│                                                         │
+│   ┌──────────────────┐    ┌──────────────────┐          │
+│   │ read_project_state│    │   read_file       │          │
+│   │ 读取项目进度JSON   │    │   读取项目文件     │          │
+│   └──────────────────┘    └──────────────────┘          │
+│                                                         │
+│   ┌──────────────────┐    ┌──────────────────┐          │
+│   │ route_to_agent    │    │  update_state     │          │
+│   │ 调度子Agent执行    │    │  更新项目状态      │          │
+│   │ 携带 plan 参数    │    │  持久化进度        │          │
+│   └──────────────────┘    └──────────────────┘          │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 一轮完整的调度循环
+
+```
+         ┌──────────────────────┐
+         │  用户输入              │
+         │  "我想做XX APP"       │
+         └──────────┬───────────┘
+                    ▼
+         ┌──────────────────────┐
+         │ Orchestrator:        │
+         │ read_project_state() │  ← 读取 project_state.json
+         │ 发现 PRD.md 不存在    │
+         └──────────┬───────────┘
+                    ▼
+         ┌──────────────────────┐
+         │ Orchestrator 输出:   │
+         │ 📊 状态摘要          │
+         │ 🗺️ 调度计划          │
+         │ → 路由到 Agent-PRD   │
+         └──────────┬───────────┘
+                    ▼
+         ┌──────────────────────┐
+         │ Orchestrator:        │
+         │ route_to_agent(      │  ← Tool Use 调用
+         │   "prd_expert",      │
+         │   task_description,  │
+         │   plan               │
+         │ )                    │
+         └──────────┬───────────┘
+                    ▼
+         ┌──────────────────────┐
+         │ Worker 执行:         │
+         │ 1. 加载 Agent 提示词  │
+         │ 2. 加载上下文文档     │
+         │ 3. 流式输出 PRD 文档  │
+         │ 4. 保存到 docs/PRD.md │
+         └──────────┬───────────┘
+                    ▼
+         ┌──────────────────────┐
+         │ Orchestrator:        │
+         │ update_state(        │  ← 记录完成状态
+         │   "prd_expert":      │
+         │   "completed"        │
+         │ )                    │
+         └──────────┬───────────┘
+                    ▼
+         ┌──────────────────────┐
+         │ ➡️ 下一步预告:        │
+         │ 技术架构师             │
+         │ (输入: docs/PRD.md)   │
+         └──────────────────────┘
+```
+
+---
+
+## ⚡ 快速开始
+
+### 方式一：启动全生命周期编排系统（推荐）
+
+```bash
+git clone https://github.com/withai2025/agents.git
+cd agents/project-orchestrator
+
+# 安装依赖
+pip install -r requirements.txt
+
+# 配置
+cp .env.example .env
+# 编辑 .env，填入 ANTHROPIC_API_KEY
+
+# 启动
+python main.py
+```
+
+```
+> 我想做一个跑步打卡 APP...
+
+Orchestrator 自动依次调度：
+Agent-PRD → Agent-ARCH → Agent-STANDARDS → Agent-SCHEMA
+→ Agent-API → Agent-DECOMP → 进入编码执行阶段...
+```
+
+### 方式二：程序化调用单个 Agent
 
 ```bash
 pip install -e .
 ```
 
-Set your API key:
-
-```bash
-export ANTHROPIC_API_KEY="sk-ant-..."
-```
-
-## Usage
-
-### Programmatic
-
 ```python
-from agents import PromptEngineer
+from agents import PRDExpert, MobileArchitect, TaskDecomposer
 
-agent = PromptEngineer()
-result = agent.run("帮我写一个代码审查的提示词")
+# 单独调用任意 Agent
+prd = PRDExpert()
+result = prd.run("我想做一个跑步打卡APP，用户可以记录路线...")
 print(result)
 ```
 
-### CLI
+### 方式三：CLI 命令行
 
 ```bash
-python -m agents.cli run prompt-engineer "帮我写一个代码审查的提示词"
+python -m agents.cli run prd-expert "帮我写一个外卖APP的PRD"
+python -m agents.cli run-stream task-decomposer "基于这些文档生成任务书"
+python -m agents.cli list  # 列出全部 Agent
 ```
 
-### As Claude Code Skill
+### 方式四：Claude Code Skill
 
-Copy the corresponding `.md` file from `skills/` into your Claude Code skills directory.
+将 `skills/` 目录下的 `.md` 文件复制到你的 Claude Code skills 目录，即可在 Claude Code 对话中直接激活任意 Agent。
 
-## Agents
+---
 
-| # | Agent | Description |
-|---|-------|-------------|
-| 1 | PromptEngineer | 提示词工程专家，根据需求设计高质量结构化提示词 |
-| 2 | ProductResearcher | AI产品调研专家，1小时内完成竞品快调研与机会发现 |
-| 3 | UXDesigner | AI产品UX全链路设计专家，Mobile-First覆盖交互/UI/设计系统 |
-| 4 | PRDExpert | APP PRD 专家助手，将模糊产品构想转化为开发团队可直接执行的需求文档 |
-| 5 | MobileArchitect | 移动端技术架构师，从 PRD 到可执行技术方案，涵盖技术选型/数据库/AI集成 |
-| 6 | CodingStandards | 编码规范专家，从 PRD+技术方案生成 CODING_STANDARDS.md 与 Cursor Prompt 模板 |
-| 7 | DBSchemaArchitect | 数据库 Schema 架构师，生成 PostgreSQL/SQLite/ER图/RLS/同步策略完整设计 |
-| 8 | APIContractArchitect | API 接口契约架构师，生成完整 API 契约文档含 TypeScript 类型/SSE/幂等/请求函数模板 |
-| 9 | TaskDecomposer | 编码任务拆分专家，将全套文档拆解为分阶段任务书含依赖图/Claude Code指令/验收标准 |
-| 10 | ProjectOrchestrator | 全局编码任务控制器，管理从产品构想到完整可运行 APP 的全生命周期，调度 13 个子 Agent |
+## 🛡️ 失败处理与降级策略
 
-## License
+每个 Agent 最多重试 2 次。全部失败后不阻塞流程，执行降级：
+
+| Agent | 失败降级策略 |
+|-------|-------------|
+| PRD 专家 | 最小 PRD：产品概述 + P0 功能列表 |
+| 技术架构师 | 默认技术栈：Expo + Supabase + Zustand + NativeWind |
+| 编码规范专家 | 最小规范集：命名规范 + 目录结构 + 禁用词列表 |
+| Schema 架构师 | 核心表：profiles + 1-2 张业务表 |
+| API 契约架构师 | 认证模块接口 + 最核心业务接口 |
+| 任务拆分专家 | 简化任务书：任务 ID + 名称 + 依赖关系 |
+
+降级版本在 `project_state.json` 中标记 `"degraded": true`，后续 Agent 基于降级版继续。
+
+---
+
+## 📂 项目结构
+
+```
+agents/
+│
+├── README.md                       # ← 你正在看的这个页面
+├── pyproject.toml                  # Python 库配置
+│
+├── 📦 src/agents/                  # Python 库（程序化调用）
+│   ├── _base.py                    # Agent 基类
+│   ├── prd_expert.py               # Agent 1-10 实现
+│   ├── ...                         #
+│   └── cli.py                      # CLI 入口（click）
+│
+├── 🎛️ project-orchestrator/        # 编排系统（全生命周期调度）
+│   ├── README.md                   # 编排系统详细文档
+│   ├── main.py                     # CLI 交互式入口
+│   ├── orchestrator.py             # 总调度器（Tool Use 循环）
+│   ├── worker.py                   # 子 Agent 执行封装
+│   ├── state.py                    # JSON 状态机
+│   ├── config.py                   # 12 Agent 注册表 + 依赖解析
+│   ├── agents/                     # 13 个系统提示词 .md 文件
+│   │   ├── orchestrator.md
+│   │   ├── phase0/                 # 6 个文档生成专家
+│   │   └── phase1n/                # 6 个编码执行 Agent
+│   └── docs/                       # 文档输出目录（自动创建）
+│
+└── 📋 skills/                      # Claude Code Skill 文件
+    ├── prd-expert.md
+    ├── mobile-architect.md
+    └── ...（共 10 个）
+```
+
+---
+
+## 📄 License
 
 MIT
