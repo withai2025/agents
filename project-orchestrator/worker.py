@@ -10,24 +10,24 @@ client = anthropic.Anthropic()
 
 
 def load_agent_prompt(agent_name: str) -> str:
-    """加载子 Agent 的系统提示词"""
+    """Load sub-agent system prompt"""
     config = AGENT_REGISTRY[agent_name]
     prompt_path = Path(config["prompt_file"])
     if not prompt_path.exists():
-        raise FileNotFoundError(f"Agent 提示词文件不存在: {prompt_path}")
+        raise FileNotFoundError(f"Agent prompt file not found: {prompt_path}")
     return prompt_path.read_text(encoding="utf-8")
 
 
 def load_context_docs(doc_paths: list[str]) -> str:
-    """加载上下文文档，合并为字符串"""
+    """Load context documents and merge into a single string"""
     parts = []
     for path in doc_paths:
         p = Path(path)
         if p.exists():
             content = p.read_text(encoding="utf-8")
-            parts.append(f"\n\n---\n# 文档：{path}\n\n{content}")
+            parts.append(f"\n\n---\n# Document: {path}\n\n{content}")
         else:
-            parts.append(f"\n\n---\n# 文档：{path}\n\n[文件不存在，请先完成前置任务]")
+            parts.append(f"\n\n---\n# Document: {path}\n\n[File does not exist. Please complete prerequisite tasks first.]")
     return "".join(parts)
 
 
@@ -37,26 +37,26 @@ def run_worker(
     extra_context: str = "",
     stream: bool = True,
 ) -> str:
-    """执行子 Agent，返回完整输出内容"""
+    """Execute sub-agent and return complete output"""
     config = AGENT_REGISTRY[agent_name]
     system_prompt = load_agent_prompt(agent_name)
 
-    # 组装上下文文档
+    # Assemble context documents
     context = load_context_docs(config.get("requires_docs", []))
     if extra_context:
-        context += f"\n\n---\n# 额外上下文\n\n{extra_context}"
+        context += f"\n\n---\n# Extra Context\n\n{extra_context}"
 
-    user_message = f"""## 任务要求
+    user_message = f"""## Task Description
 {task_description}
 
-## 可用文档上下文
-{context if context else "（无前置文档）"}
+## Available Document Context
+{context if context else "(No prerequisite documents)"}
 """
 
     console.print(
         Panel(
-            f"[bold cyan]🤖 {config['display_name']} 启动中...[/bold cyan]\n"
-            f"模型：{config['model']}",
+            f"[bold cyan]🤖 {config['display_name']} starting up...[/bold cyan]\n"
+            f"Model: {config['model']}",
             border_style="cyan",
         )
     )
@@ -73,7 +73,7 @@ def run_worker(
             for text in stream_obj.text_stream:
                 print(text, end="", flush=True)
                 full_response += text
-        print()  # 换行
+        print()  # newline
     else:
         response = client.messages.create(
             model=config["model"],
@@ -88,7 +88,7 @@ def run_worker(
 
 
 def save_agent_output(agent_name: str, content: str) -> str | None:
-    """将 Agent 输出保存到对应文档路径，返回保存路径"""
+    """Save agent output to the corresponding document path; return the save path"""
     config = AGENT_REGISTRY[agent_name]
     output_path = config.get("output_doc")
     if not output_path:
@@ -97,5 +97,5 @@ def save_agent_output(agent_name: str, content: str) -> str | None:
     p = Path(output_path)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(content, encoding="utf-8")
-    console.print(f"[green]✅ 文档已保存：{output_path}[/green]")
+    console.print(f"[green]✅ Document saved: {output_path}[/green]")
     return output_path

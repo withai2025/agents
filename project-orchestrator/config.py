@@ -9,12 +9,12 @@ WORKER_MODEL_HEAVY = os.getenv("WORKER_MODEL_HEAVY", "claude-opus-4-7")
 WORKER_MODEL_LIGHT = os.getenv("WORKER_MODEL_LIGHT", "claude-sonnet-4-6")
 PROJECT_NAME = os.getenv("PROJECT_NAME", "my_app")
 
-# 子 Agent 名册：agent_name -> 配置
+# Agent registry: agent_name -> config
 AGENT_REGISTRY = {
-    # Phase 0: 文档生成 Agent（严格串行）
+    # Phase 0: Document generation agents (strict serial)
     "prd_expert": {
         "phase": 0,
-        "display_name": "PRD 专家",
+        "display_name": "PRD Expert",
         "model": WORKER_MODEL_HEAVY,
         "prompt_file": "agents/phase0/prd_expert.md",
         "output_doc": "docs/PRD.md",
@@ -23,7 +23,7 @@ AGENT_REGISTRY = {
     },
     "tech_architect": {
         "phase": 0,
-        "display_name": "技术架构师",
+        "display_name": "Tech Architect",
         "model": WORKER_MODEL_HEAVY,
         "prompt_file": "agents/phase0/tech_architect.md",
         "output_doc": "docs/TECH_ARCHITECTURE.md",
@@ -32,7 +32,7 @@ AGENT_REGISTRY = {
     },
     "coding_standards": {
         "phase": 0,
-        "display_name": "编码规范专家",
+        "display_name": "Coding Standards Expert",
         "model": WORKER_MODEL_HEAVY,
         "prompt_file": "agents/phase0/coding_standards.md",
         "output_doc": "docs/CODING_STANDARDS.md",
@@ -41,7 +41,7 @@ AGENT_REGISTRY = {
     },
     "schema_architect": {
         "phase": 0,
-        "display_name": "Schema 架构师",
+        "display_name": "Schema Architect",
         "model": WORKER_MODEL_HEAVY,
         "prompt_file": "agents/phase0/schema_architect.md",
         "output_doc": "docs/DB_SCHEMA.md",
@@ -54,7 +54,7 @@ AGENT_REGISTRY = {
     },
     "api_contract": {
         "phase": 0,
-        "display_name": "API 契约架构师",
+        "display_name": "API Contract Architect",
         "model": WORKER_MODEL_HEAVY,
         "prompt_file": "agents/phase0/api_contract.md",
         "output_doc": "docs/API_CONTRACT.md",
@@ -68,7 +68,7 @@ AGENT_REGISTRY = {
     },
     "task_decomposer": {
         "phase": 0,
-        "display_name": "任务拆分专家",
+        "display_name": "Task Decomposer",
         "model": WORKER_MODEL_HEAVY,
         "prompt_file": "agents/phase0/task_decomposer.md",
         "output_doc": "docs/TASK_BOOK.md",
@@ -81,10 +81,10 @@ AGENT_REGISTRY = {
         ],
         "max_tokens": 32000,
     },
-    # Phase 1-N: 编码执行 Agent
+    # Phase 1-N: Coding execution agents
     "agent_db": {
         "phase": 1,
-        "display_name": "数据库迁移 Agent",
+        "display_name": "Agent-DB",
         "model": WORKER_MODEL_LIGHT,
         "prompt_file": "agents/phase1n/agent_db.md",
         "output_doc": None,
@@ -93,7 +93,7 @@ AGENT_REGISTRY = {
     },
     "agent_be": {
         "phase": 1,
-        "display_name": "后端开发 Agent",
+        "display_name": "Agent-BE",
         "model": WORKER_MODEL_LIGHT,
         "prompt_file": "agents/phase1n/agent_be.md",
         "output_doc": None,
@@ -102,7 +102,7 @@ AGENT_REGISTRY = {
     },
     "agent_fe": {
         "phase": 1,
-        "display_name": "前端开发 Agent",
+        "display_name": "Agent-FE",
         "model": WORKER_MODEL_LIGHT,
         "prompt_file": "agents/phase1n/agent_fe.md",
         "output_doc": None,
@@ -111,7 +111,7 @@ AGENT_REGISTRY = {
     },
     "agent_connect": {
         "phase": 1,
-        "display_name": "联调对接 Agent",
+        "display_name": "Agent-CONNECT",
         "model": WORKER_MODEL_LIGHT,
         "prompt_file": "agents/phase1n/agent_connect.md",
         "output_doc": None,
@@ -120,7 +120,7 @@ AGENT_REGISTRY = {
     },
     "agent_verify": {
         "phase": 1,
-        "display_name": "验收测试 Agent",
+        "display_name": "Agent-VERIFY",
         "model": WORKER_MODEL_LIGHT,
         "prompt_file": "agents/phase1n/agent_verify.md",
         "output_doc": None,
@@ -129,7 +129,7 @@ AGENT_REGISTRY = {
     },
     "agent_fix": {
         "phase": 1,
-        "display_name": "报错修复 Agent",
+        "display_name": "Agent-FIX",
         "model": WORKER_MODEL_LIGHT,
         "prompt_file": "agents/phase1n/agent_fix.md",
         "output_doc": None,
@@ -138,7 +138,7 @@ AGENT_REGISTRY = {
     },
 }
 
-# Phase 0 执行顺序（严格串行）
+# Phase 0 execution order (strict serial)
 PHASE0_ORDER = [
     "prd_expert",
     "tech_architect",

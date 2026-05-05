@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Project Orchestrator - Orchestrator-Workers APP 开发编排系统
-使用方法：python main.py
+Project Orchestrator - Orchestrator-Workers APP Development Orchestration System
+Usage: python main.py
 """
 
 import sys
@@ -13,12 +13,12 @@ console = Console()
 
 
 def check_env():
-    """检查环境配置"""
+    """Check environment configuration"""
     from dotenv import load_dotenv
     import os
     load_dotenv()
     if not os.getenv("ANTHROPIC_API_KEY"):
-        console.print("[red]❌ 请在 .env 文件中设置 ANTHROPIC_API_KEY[/red]")
+        console.print("[red]❌ Please set ANTHROPIC_API_KEY in your .env file[/red]")
         sys.exit(1)
 
 
@@ -31,16 +31,16 @@ def main():
     console.print(
         Panel(
             "[bold blue]🚀 Project Orchestrator v2.0[/bold blue]\n"
-            "Orchestrator-Workers APP 全生命周期开发编排系统\n\n"
-            "命令：\n"
-            "  status  → 查看当前开发进度\n"
-            "  exit    → 退出系统\n"
-            "  其他输入 → 交给 Orchestrator 分析并调度",
+            "Orchestrator-Workers Full-Lifecycle APP Development Orchestration System\n\n"
+            "Commands:\n"
+            "  status  → View current development progress\n"
+            "  exit    → Exit the system\n"
+            "  anything else → Send to Orchestrator for analysis and scheduling",
             border_style="blue",
         )
     )
 
-    # 首次启动自动打印状态
+    # Auto-print status on first launch
     orch.print_status()
 
     while True:
@@ -49,17 +49,17 @@ def main():
             if not user_input:
                 continue
             if user_input.lower() == "exit":
-                console.print("再见！")
+                console.print("Goodbye!")
                 break
             elif user_input.lower() == "status":
                 orch.print_status()
             else:
                 orch.run(user_input)
         except KeyboardInterrupt:
-            console.print("\n\n已中断。")
+            console.print("\n\nInterrupted.")
             break
         except Exception as e:
-            console.print(f"[red]系统错误：{e}[/red]")
+            console.print(f"[red]System error: {e}[/red]")
 
 
 if __name__ == "__main__":

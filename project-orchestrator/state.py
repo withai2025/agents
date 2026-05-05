@@ -51,7 +51,7 @@ def init_state(project_name: str) -> dict:
 
 
 def get_next_phase0_agent(state: dict) -> str | None:
-    """返回下一个待执行的 Phase 0 Agent 名称，全部完成返回 None"""
+    """Return the name of the next pending Phase 0 agent, or None if all complete"""
     from config import PHASE0_ORDER
     for agent_name in PHASE0_ORDER:
         doc_state = state["phase0_documents"].get(agent_name, {})

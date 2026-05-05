@@ -17,8 +17,8 @@ def main():
     print(f"Temperature: {agent.config.temperature}")
     print()
 
-    # Example: generate a prompt
-    user_request = "帮我写一个用于代码审查的 AI 提示词，要求输出结构化审查意见，包含问题等级和修复建议"
+    # Example: generate a prompt for code review
+    user_request = "Write an AI prompt for code review that outputs structured feedback with severity levels and fix suggestions"
 
     print(f"Input: {user_request}")
     print("\n" + "=" * 60 + "\n")

@@ -1,47 +1,51 @@
 # 🚀 Project Orchestrator v2.0
 
-> **从产品构想到完整可运行 APP 的全生命周期 AI 编排系统**
+> **Full-lifecycle AI orchestration system — from product concept to a complete, runnable app**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![Anthropic SDK](https://img.shields.io/badge/Anthropic%20SDK-0.40+-green.svg)](https://github.com/anthropics/anthropic-sdk-python)
 
----
-
-## 🤔 这是什么？
-
-**Project Orchestrator** 是一个基于 Anthropic Claude 的 Orchestrator-Workers 架构系统，
-将「我有一个 APP 想法」这一句话，转化为一个**完整可运行的 APP**。
-
-它不是单个 AI Agent，而是一个**编排 13 个专业 AI Agent 的总调度系统**。每个 Agent 都拥有经过精心设计的系统提示词、明确的输入/输出契约、以及校验门禁。
-
-> 想象你有一个 13 人的全栈开发团队：1 个项目经理 + 6 个规划专家 + 6 个执行工程师。你只需告诉项目经理「我想做一个外卖 APP」，整个团队就会自动运转起来。
+<p align="center">
+  <b>English</b> · <a href="README_CN.md">中文</a>
+</p>
 
 ---
 
-## 🎯 核心能力
+## 🤔 What is this?
 
-| 能力 | 描述 |
+**Project Orchestrator** is an Orchestrator-Workers architecture system powered by Anthropic Claude that turns a single sentence — "I have an app idea" — into a **complete, runnable app**.
+
+It is not a single AI agent, but an **orchestration system that coordinates 13 specialized AI agents**. Each agent has a carefully crafted system prompt, explicit input/output contracts, and validation gates.
+
+> Imagine you have a 13-person full-stack dev team: 1 project manager + 6 planning experts + 6 execution engineers. You just tell the project manager "I want to build a food delivery app," and the entire team starts working autonomously.
+
+---
+
+## 🎯 Core Capabilities
+
+| Capability | Description |
 |------|------|
-| 🧭 **全生命周期管理** | 从产品构想 → 六份规划文档 → 编码执行 → 验收交付，一站式覆盖 |
-| 🔗 **严格串行链** | Phase 0 六步文档生成严格有序，每步产出是下一步的输入 |
-| ⚡ **混合串并行** | Phase 1-N 编码阶段自动识别可并行任务，最大化执行效率 |
-| 🔧 **Tool Use 调度** | Orchestrator 通过 Anthropic Tool Use 机制动态路由子 Agent |
-| 📊 **状态持久化** | JSON 文件记录每个任务的进度、重试次数、降级标记 |
-| 🛡️ **三层验证** | 执行前审查 → 节点级输出校验 → 里程碑独立审查 |
-| 🔄 **失败降级** | 每个 Agent 最多重试 2 次，失败后自动降级、不阻塞流程 |
+| 🧭 **Full-Lifecycle Management** | From product concept → six planning documents → code execution → verified delivery, all in one pipeline |
+| 🔗 **Strict Serial Chain** | Phase 0's six-step document generation is strictly ordered; each step's output feeds the next step |
+| ⚡ **Hybrid Serial/Parallel** | Phase 1-N coding phase auto-detects parallelizable tasks for maximum execution efficiency |
+| 🔧 **Tool Use Scheduling** | Orchestrator dynamically routes sub-agents via Claude's Tool Use mechanism |
+| 📊 **State Persistence** | JSON file tracks progress, retry count, and degradation flags for every task |
+| 🛡️ **Three-Layer Verification** | Pre-execution review → node-level output validation → milestone independent review |
+| 🔄 **Failure Degradation** | Each agent retries up to 2 times; on failure, automatically degrades without blocking the pipeline |
 
 ---
 
-## 🏗️ 架构总览
+## 🏗️ Architecture Overview
 
 ```
                           ┌──────────────────────────┐
                           │    🧠 Orchestrator        │
-                          │   (Claude Opus 4.7)       │
+                          │   (Claude Opus 4.6)       │
                           │                          │
-                          │  Tool Use 驱动调度决策     │
-                          │  自动判断当前阶段/下一步    │
+                          │  Tool Use-driven dispatch │
+                          │  Auto-detects current     │
+                          │  phase / next step        │
                           └────┬───────┬─────────┬───┘
                                │       │         │
                     route_to_agent  read_project_state  update_state
@@ -49,229 +53,236 @@
           ┌────────────────────┼─────────────────────────┤
           │                    │                         │
     ┌─────▼──────┐    ┌───────▼────────┐    ┌───────────▼───────────┐
-    │  Phase 0   │    │   Phase 1-N     │    │   project_state.json    │
-    │ 文档生成阶段│    │  编码执行阶段     │    │  进度/重试/降级追踪     │
-    │ (严格串行)  │    │  (混合串并行)    │    └───────────────────────┘
+    │  Phase 0   │    │   Phase 1-N     │    │  project_state.json   │
+    │ Document   │    │  Code Execution │    │  Progress / Retries /  │
+    │ Generation │    │  (Hybrid S/P)   │    │  Degradation Tracking  │
+    │ (Strictly  │    │                 │    └───────────────────────┘
+    │  Serial)   │    │                 │
     └────────────┘    └────────────────┘
 ```
 
-### Phase 0：文档生成（严格串行 6 步）
+### Phase 0: Document Generation (Strictly Serial — 6 Steps)
 
 ```
-用户构想
+User Concept
     │
     ▼
 ┌──────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│ ① PRD 专家    │────▶│ ② 技术架构师      │────▶│ ③ 编码规范专家    │
+│ ① PRD Expert  │────▶│ ② Tech Architect  │────▶│ ③ Coding Standards│
 │ docs/PRD.md  │     │ TECH_ARCHITECTURE │     │ CODING_STANDARDS │
 └──────────────┘     └──────────────────┘     └────────┬─────────┘
                                                        │
               ┌────────────────────────────────────────┘
               ▼
 ┌──────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│ ④ Schema 架构师│────▶│ ⑤ API 契约架构师  │────▶│ ⑥ 任务拆分专家    │
+│ ④ Schema Arch │────▶│ ⑤ API Contract   │────▶│ ⑥ Task Decomposer │
 │ DB_SCHEMA.md │     │ API_CONTRACT.md  │     │ TASK_BOOK.md     │
 └──────────────┘     └──────────────────┘     └──────────────────┘
 ```
 
-### Phase 1-N：编码执行（混合串并行）
+### Phase 1-N: Code Execution (Hybrid Serial/Parallel)
 
 ```
 TASK_BOOK.md
     │
     ▼
 ┌──────────┐    ┌──────────┐    ┌──────────┐
-│ Agent-DB │───▶│ Agent-FE │║│ Agent-BE │  ← 前后端可并行
-│ 数据库迁移│    │ 前端页面  │║│ 后端接口  │
+│ Agent-DB │───▶│ Agent-FE │║│ Agent-BE │  ← Frontend/Backend can run in parallel
+│ DB Migr  │    │ Frontend │║│ Backend   │
 └──────────┘    └────┬─────┘║└────┬─────┘
                      │      ║     │
                      └──────╫─────┘
                             ▼
                      ┌──────────────┐
                      │ Agent-CONNECT │
-                     │   前后端联调   │
+                     │  FE/BE Link   │
                      └──────┬───────┘
                             ▼
                      ┌──────────────┐
-                     │ Agent-VERIFY  │────── 不通过 ──▶ Agent-FIX
-                     │   验收测试    │                   报错修复
+                     │ Agent-VERIFY  │────── FAIL ──▶ Agent-FIX
+                     │  Verification │                  Bug Fix
                      └──────┬───────┘
-                            │ 通过
+                            │ PASS
                             ▼
                      ┌──────────────┐
                      │ Agent-REVIEW  │
-                     │ 独立审查(新对话)│
+                     │ Indep. Review │
+                     │ (New Session) │
                      └──────────────┘
                             │
                             ▼
-                    🎉 完整可运行的 APP
+                    🎉 Complete, Runnable APP
 ```
 
 ---
 
-## 👥 Agent 全名册
+## 👥 Full Agent Roster
 
-### 🧭 Orchestrator（总调度器）
+### 🧭 Orchestrator (Master Scheduler)
 
-| Agent | 模型 | 职责 |
+| Agent | Model | Responsibility |
 |-------|------|------|
-| 🎛️ Orchestrator | Claude Opus 4.7 | 读取项目状态、动态路由子 Agent、管理串并行决策 |
+| 🎛️ Orchestrator | Claude Opus 4.6 | Read project state, dynamically route sub-agents, manage serial/parallel decisions |
 
-### 📋 Phase 0：规划专家团队（6 人，严格串行）
+### 📋 Phase 0: Planning Expert Team (6 agents, strictly serial)
 
-| # | Agent | 输出文档 | 输入依赖 | 核心职责 |
+| # | Agent | Output Document | Input Dependency | Core Responsibility |
 |---|-------|---------|---------|---------|
-| 1 | 📝 PRD 专家 | `docs/PRD.md` | 用户构想 | 将模糊想法转化为 9 章节结构化 PRD，Given-When-Then 验收标准 |
-| 2 | 🏗️ 技术架构师 | `docs/TECH_ARCHITECTURE.md` | PRD | 技术选型对比论证、目录结构、MVP 阶段划分、环境搭建步骤 |
-| 3 | 📏 编码规范专家 | `docs/CODING_STANDARDS.md` | PRD + 技术方案 | 13 章节编码规范，含 DO/DON'T 示例、Cursor Prompt 模板 |
-| 4 | 🗄️ Schema 架构师 | `docs/DB_SCHEMA.md` | PRD + 技术方案 + 规范 | ER 图、PostgreSQL/SQLite DDL、RLS 策略、Redis 缓存键 |
-| 5 | 🔌 API 契约架构师 | `docs/API_CONTRACT.md` | PRD + 技术方案 + Schema + 规范 | API 接口定义、TypeScript 类型、错误码体系、弱网容错 |
-| 6 | 📋 任务拆分专家 | `docs/TASK_BOOK.md` | 全部五份文档 | 分阶段任务书、依赖图、Mock 策略、可复制 Claude Code 指令 |
+| 1 | 📝 PRD Expert | `docs/PRD.md` | User concept | Transform vague ideas into a 9-chapter structured PRD with Given-When-Then acceptance criteria |
+| 2 | 🏗️ Tech Architect | `docs/TECH_ARCHITECTURE.md` | PRD | Tech stack comparison & rationale, directory structure, MVP phase breakdown, environment setup |
+| 3 | 📏 Coding Standards Expert | `docs/CODING_STANDARDS.md` | PRD + Tech Architecture | 13-chapter coding standards with DO/DON'T examples and Cursor Prompt templates |
+| 4 | 🗄️ Schema Architect | `docs/DB_SCHEMA.md` | PRD + Tech Architecture + Standards | ER diagram, PostgreSQL/SQLite DDL, RLS policies, Redis cache keys |
+| 5 | 🔌 API Contract Architect | `docs/API_CONTRACT.md` | PRD + Tech Architecture + Schema + Standards | API endpoint definitions, TypeScript types, error code system, weak-network fault tolerance |
+| 6 | 📋 Task Decomposer | `docs/TASK_BOOK.md` | All five prior documents | Phased task book, dependency graph, mock strategy, copy-paste ready Claude Code instructions |
 
-### 💻 Phase 1-N：编码执行团队（6 人，混合串并行）
+### 💻 Phase 1-N: Coding Execution Team (6 agents, hybrid serial/parallel)
 
-| Agent | 触发条件 | 产出 |
+| Agent | Trigger Condition | Output |
 |-------|---------|------|
-| 🗃️ Agent-DB | 任务书数据库迁移任务 | Supabase 建表 SQL + RLS 策略 |
-| 🔧 Agent-BE | 后端 Edge Function 任务 | TypeScript Edge Function 代码 |
-| 🎨 Agent-FE | 前端页面/组件任务 | React Native 页面 + Mock 数据 |
-| 🔗 Agent-CONNECT | 前后端均完成时 | Mock 替换为真实 API 调用 |
-| ✅ Agent-VERIFY | 任意编码任务完成后 | 逐条验收报告 |
-| 🩹 Agent-FIX | 编译报错/验收失败 | 精确到行号的修复方案 |
+| 🗃️ Agent-DB | Task book database migration tasks | Supabase DDL SQL + RLS policies |
+| 🔧 Agent-BE | Backend Edge Function tasks | TypeScript Edge Function code |
+| 🎨 Agent-FE | Frontend page/component tasks | React Native pages + mock data |
+| 🔗 Agent-CONNECT | Both frontend & backend complete | Replace mocks with real API calls |
+| ✅ Agent-VERIFY | After any coding task completes | Item-by-item verification report |
+| 🩹 Agent-FIX | Build errors / verification failures | Fix plan with line-level precision |
 
 ---
 
-## ⚡ 快速开始
+## ⚡ Quick Start
 
-### 1. 克隆仓库
+### 1. Clone the repo
 
 ```bash
-git clone https://github.com/withAIx/agents.git
-cd agents/project-orchestrator
+git clone https://github.com/withAIx/AppForge.git
+cd AppForge/project-orchestrator
 ```
 
-### 2. 安装依赖
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. 配置 API Key
+### 3. Configure API key
 
 ```bash
 cp .env.example .env
-# 编辑 .env，填入你的 ANTHROPIC_API_KEY
+# Edit .env and fill in your ANTHROPIC_API_KEY
 ```
 
-`.env` 内容：
+`.env` content:
 
 ```env
 ANTHROPIC_API_KEY=sk-ant-...
-ORCHESTRATOR_MODEL=claude-opus-4-7    # 总调度器模型
-WORKER_MODEL_HEAVY=claude-opus-4-7    # 文档生成 Agent 模型
-WORKER_MODEL_LIGHT=claude-sonnet-4-6   # 编码执行 Agent 模型
-PROJECT_NAME=my_app                    # 项目名称
+ORCHESTRATOR_MODEL=claude-opus-4-6    # Orchestrator model
+WORKER_MODEL_HEAVY=claude-opus-4-6    # Document generation agent model
+WORKER_MODEL_LIGHT=claude-sonnet-4-6  # Code execution agent model
+PROJECT_NAME=my_app                    # Project name
 ```
 
-### 4. 启动系统
+### 4. Launch the system
 
 ```bash
 python main.py
 ```
 
-### 5. 开始你的第一个项目
+### 5. Start your first project
 
 ```
-> 我想做一个跑步打卡 APP，用户可以记录跑步路线、配速、消耗卡路里，还能加好友互相PK
+> I want to build a running tracker app where users can log routes, pace, calories burned, and compete with friends
 
-Orchestrator 会自动：
-1. 分析当前状态（project_state.json）
-2. 输出状态报告和调度计划
-3. 调用 Agent-PRD 生成产品需求文档
-4. 保存输出到 docs/PRD.md
-5. 提示下一步操作
+Orchestrator will automatically:
+1. Analyze current state (project_state.json)
+2. Output status report and scheduling plan
+3. Call Agent-PRD to generate the product requirements document
+4. Save output to docs/PRD.md
+5. Prompt for the next step
 ```
 
 ---
 
-## 📊 交互示例
+## 📊 Interactive Demo
 
 ```text
 $ python main.py
 
 🚀 Project Orchestrator v2.0
-Orchestrator-Workers APP 全生命周期开发编排系统
+Orchestrator-Workers Full-Lifecycle APP Development Orchestration System
 
-命令：
-  status  → 查看当前开发进度
-  exit    → 退出系统
-  其他输入 → 交给 Orchestrator 分析并调度
+Commands:
+  status  → View current development progress
+  exit    → Exit the system
+  anything else → Send to Orchestrator for analysis and scheduling
 
-┌───────────────── 📊 项目开发进度 ─────────────────┐
-│ Agent          │ 文档                       │ 状态    │
-│─────────────── ┼─────────────────────────── ┼────────│
-│ PRD 专家       │ docs/PRD.md               │ ⏳ 待启动 │
-│ 技术架构师     │ docs/TECH_ARCHITECTURE.md  │ ⏳ 待启动 │
-│ 编码规范专家   │ docs/CODING_STANDARDS.md   │ ⏳ 待启动 │
-│ Schema 架构师  │ docs/DB_SCHEMA.md          │ ⏳ 待启动 │
-│ API 契约架构师 │ docs/API_CONTRACT.md       │ ⏳ 待启动 │
-│ 任务拆分专家   │ docs/TASK_BOOK.md          │ ⏳ 待启动 │
-└─────────────────────────────────────────────────────┘
+┌───────────────── 📊 Project Development Progress ─────────────────┐
+│ Agent              │ Document                    │ Status         │
+│─────────────────── ┼──────────────────────────── ┼───────────────│
+│ PRD Expert         │ docs/PRD.md                │ ⏳ Pending     │
+│ Tech Architect     │ docs/TECH_ARCHITECTURE.md   │ ⏳ Pending     │
+│ Coding Standards   │ docs/CODING_STANDARDS.md    │ ⏳ Pending     │
+│ Schema Architect   │ docs/DB_SCHEMA.md           │ ⏳ Pending     │
+│ API Contract       │ docs/API_CONTRACT.md        │ ⏳ Pending     │
+│ Task Decomposer    │ docs/TASK_BOOK.md           │ ⏳ Pending     │
+└──────────────────────────────────────────────────────────────────┘
 
-➡️  Phase 0 进行中：下一步 → PRD 专家
+➡️  Phase 0 In Progress: Next → PRD Expert
 
-> 我想做一个跑步打卡APP
+> I want to build a running tracker app
 
-🧠 Orchestrator 分析中...
+🧠 Orchestrator analyzing...
 
 ┌───────────────── 📊 Orchestrator ─────────────────┐
 │                                                   │
-│ 📊 当前状态：Phase 0 文档生成阶段                    │
-│ 第一步：PRD 专家 — 将产品构想转化为结构化 PRD         │
+│ 📊 Current State: Phase 0 Document Generation      │
+│ Step 1: PRD Expert — turn product concept into     │
+│         a structured PRD                           │
 │                                                   │
-│ 路由理由：docs/PRD.md 不存在，根据规则 0 调用 Agent-PRD│
-│ 预期产出：9 章节 PRD 文档，含 Given-When-Then 验收标准 │
+│ Routing reason: docs/PRD.md does not exist;        │
+│ calling Agent-PRD per Rule 0                       │
+│ Expected output: 9-chapter PRD with                │
+│ Given-When-Then acceptance criteria                │
 │                                                   │
 └───────────────────────────────────────────────────┘
 
-┌───────────────── 🗺️ 调度计划 ─────────────────┐
-│ 路由到：PRD 专家                                │
-│ 理由：产品构想已收到，需要先生成 PRD 文档作为所有   │
-│       后续专家的输入基准                          │
-│ 预期产出：docs/PRD.md                           │
-└───────────────────────────────────────────────┘
+┌───────────────── 🗺️ Scheduling Plan ─────────────────┐
+│ Routing to: PRD Expert                                │
+│ Reason: Product concept received; must generate PRD   │
+│         as the baseline input for all subsequent      │
+│         experts                                       │
+│ Expected output: docs/PRD.md                          │
+└──────────────────────────────────────────────────────┘
 
-🤖 PRD 专家 启动中...
-[流式输出完整 PRD 文档...]
+🤖 PRD Expert starting up...
+[Streaming full PRD document...]
 
-✅ 文档已保存：docs/PRD.md
+✅ Document saved: docs/PRD.md
 
-➡️  下一步：技术架构师（输入：docs/PRD.md）
+➡️  Next: Tech Architect (input: docs/PRD.md)
 ```
 
 ---
 
-## 🔧 系统架构
+## 🔧 System Architecture
 
 ```
 project-orchestrator/
 │
-├── main.py                  # CLI 交互式入口（REPL 循环）
-├── orchestrator.py          # 总调度器（Anthropic Tool Use 循环）
-├── worker.py                # 子 Agent 执行封装（流式 + 保存）
-├── state.py                 # JSON 状态机（进度追踪 + 重试/降级）
-├── config.py                # 12 Agent 注册表 + 依赖解析
+├── main.py                  # CLI interactive entry point (REPL loop)
+├── orchestrator.py          # Master scheduler (Claude Tool Use loop)
+├── worker.py                # Sub-agent execution wrapper (streaming + save)
+├── state.py                 # JSON state machine (progress tracking + retries/degradation)
+├── config.py                # 12-agent registry + dependency resolution
 │
-├── agents/                  # 系统提示词库（13 个 .md 文件）
-│   ├── orchestrator.md      # 总调度器提示词
-│   ├── phase0/              # 6 个文档生成专家提示词
-│   │   ├── prd_expert.md          (15KB, 387 行)
-│   │   ├── tech_architect.md      (16KB, 413 行)
-│   │   ├── coding_standards.md    (22KB, 694 行)
-│   │   ├── schema_architect.md    (26KB, 739 行)
-│   │   ├── api_contract.md        (29KB, 901 行)
-│   │   └── task_decomposer.md     (15KB, 381 行)
-│   └── phase1n/             # 6 个编码执行 Agent 提示词
+├── agents/                  # System prompt library (13 .md files)
+│   ├── orchestrator.md      # Master scheduler prompt
+│   ├── phase0/              # 6 document-generation expert prompts
+│   │   ├── prd_expert.md          (15KB, 387 lines)
+│   │   ├── tech_architect.md      (16KB, 413 lines)
+│   │   ├── coding_standards.md    (22KB, 694 lines)
+│   │   ├── schema_architect.md    (26KB, 739 lines)
+│   │   ├── api_contract.md        (29KB, 901 lines)
+│   │   └── task_decomposer.md     (15KB, 381 lines)
+│   └── phase1n/             # 6 code-execution agent prompts
 │       ├── agent_db.md
 │       ├── agent_be.md
 │       ├── agent_fe.md
@@ -279,99 +290,99 @@ project-orchestrator/
 │       ├── agent_verify.md
 │       └── agent_fix.md
 │
-├── docs/                    # 文档输出目录（自动创建）
-├── project_state.json       # 项目状态文件（自动创建和管理）
+├── docs/                    # Document output directory (auto-created)
+├── project_state.json       # Project state file (auto-created and managed)
 ├── requirements.txt
 └── .env.example
 ```
 
 ---
 
-## 🎛️ Orchestrator 的 Tool Use 机制
+## 🎛️ Orchestrator's Tool Use Mechanism
 
-Orchestrator 通过 Anthropic 原生 Tool Use 实现调度决策。它拥有 4 个工具：
+The Orchestrator uses Claude's native Tool Use to make scheduling decisions. It has 4 tools:
 
-| Tool | 用途 | 调用时机 |
+| Tool | Purpose | When Called |
 |------|------|---------|
-| `read_project_state` | 读取当前 `project_state.json` | 每轮对话开始时，了解项目进度 |
-| `route_to_agent` | 调度指定子 Agent 执行任务 | 分析后确定下一步应执行哪个 Agent |
-| `update_state` | 更新项目状态文件 | Agent 执行完成后，记录进度 |
-| `read_file` | 读取项目文件内容 | 需要检查文档内容或代码时 |
+| `read_project_state` | Read current `project_state.json` | Every turn start, to understand project progress |
+| `route_to_agent` | Dispatch a sub-agent to execute a task | After analysis, when the next step is determined |
+| `update_state` | Update project state file | After agent execution completes, to record progress |
+| `read_file` | Read project file contents | When document content or code needs inspection |
 
-调度流程：
+Scheduling flow:
 
 ```
-用户输入 → Orchestrator 读取状态 → 分析调度计划
-    → 调用 route_to_agent（携带 plan 参数）
-    → Worker 执行子 Agent（流式输出 + 自动保存）
-    → Orchestrator 更新 project_state.json
-    → 输出下一步预告
+User input → Orchestrator reads state → Analyzes & plans
+    → Calls route_to_agent (with plan parameter)
+    → Worker executes sub-agent (streaming output + auto-save)
+    → Orchestrator updates project_state.json
+    → Outputs next-step preview
 ```
 
 ---
 
-## 🔄 失败处理策略
+## 🔄 Failure Handling Strategy
 
-### 重试与降级
+### Retry & Degradation
 
-每个 Agent 最多重试 **2 次**。2 次全部失败后：
+Each agent retries at most **2 times**. After 2 full failures:
 
-| Agent | 降级策略 |
+| Agent | Degradation Strategy |
 |-------|---------|
-| PRD 专家 | 生成「最小 PRD」（产品概述 + P0 功能列表） |
-| 技术架构师 | 使用默认技术栈（Expo + Supabase + Zustand + NativeWind） |
-| 编码规范专家 | 使用最小规范集（命名规范 + 目录结构 + 禁用词列表） |
-| Schema 架构师 | 只生成 profiles 表 + 1-2 张核心业务表 |
-| API 契约架构师 | 只生成认证模块 + 最核心业务接口 |
-| 任务拆分专家 | 生成简化任务书（任务 ID + 名称 + 依赖关系） |
+| PRD Expert | Generate "Minimum PRD" (product overview + P0 feature list) |
+| Tech Architect | Use default tech stack (Expo + Supabase + Zustand + NativeWind) |
+| Coding Standards Expert | Use minimum standards set (naming conventions + directory structure + banned words list) |
+| Schema Architect | Generate only profiles table + 1–2 core business tables |
+| API Contract Architect | Generate only auth module + the most critical business endpoints |
+| Task Decomposer | Generate simplified task book (task ID + name + dependencies) |
 
-降级版本在 `project_state.json` 中标记 `"degraded": true`，后续 Agent 基于降级版继续执行，不阻塞流程。
-
----
-
-## 🚦 冲突解决优先级
-
-当多份文档之间出现矛盾时（常见：字段名不一致），按以下优先级裁决：
-
-```
-Level 1: PRD 文档      ← 功能行为的最终裁决
-Level 2: 技术方案文档   ← 架构选型不可被后续覆盖
-Level 3: 编码规范文档   ← 命名风格以规范为准
-Level 4: Schema 文档    ← 字段名以 Schema 为准
-Level 5: API 契约文档   ← 接口格式以契约为准
-```
-
-处理步骤：识别冲突 → 查 PRD 确认业务意图 → 以更高层级文档为准 → 记录冲突决策到 `project_state.json`
+Degraded versions are marked `"degraded": true` in `project_state.json`. Subsequent agents continue working from the degraded version without blocking the pipeline.
 
 ---
 
-## 📝 常用命令
+## 🚦 Conflict Resolution Priority
+
+When contradictions arise between documents (common issue: inconsistent field names), resolve by this priority order:
+
+```
+Level 1: PRD Document      ← Final arbiter of feature behavior
+Level 2: Tech Architecture ← Architecture decisions are not overridable by downstream docs
+Level 3: Coding Standards  ← Naming style follows standards as authoritative
+Level 4: Schema Document   ← Field names follow Schema as authoritative
+Level 5: API Contract      ← Endpoint formats follow Contract as authoritative
+```
+
+Process: Identify conflict → Check PRD for business intent → Defer to higher-level document → Record conflict decision in `project_state.json`
+
+---
+
+## 📝 Common Commands
 
 ```bash
-# 启动系统
+# Launch the system
 python main.py
 
-# 系统内命令
-> status          # 查看当前开发进度
-> exit            # 退出系统
+# In-system commands
+> status          # View current development progress
+> exit            # Exit the system
 
-# 重置项目（删除所有文档和状态，重新开始）
+# Reset project (delete all docs and state, start fresh)
 rm -rf docs/ project_state.json
 python main.py
 ```
 
 ---
 
-## 🔗 与 agents 库的关系
+## 🔗 Relationship with the agents Library
 
-本系统是 [agents](https://github.com/withAIx/agents) Python 库的配套编排系统：
+This system is the companion orchestration system for the [AppForge](https://github.com/withAIx/AppForge) Python library:
 
-| 组件 | 用途 |
+| Component | Purpose |
 |------|------|
-| `agents/` Python 库 | 单个 Agent 的程序化调用（`from agents import PRDExpert`） |
-| `project-orchestrator/` | 13 Agent 全生命周期编排系统（Tool Use 自动调度） |
+| `agents/` Python library | Programmatic invocation of individual agents (`from agents import PRDExpert`) |
+| `project-orchestrator/` | 13-agent full-lifecycle orchestration system (Tool Use auto-scheduling) |
 
-`agents/` 库中的每个 Agent 的系统提示词，在 `project-orchestrator/agents/phase0/` 中作为 Worker 提示词被复用。
+Each agent's system prompt in the `agents/` library is reused as a worker prompt in `project-orchestrator/agents/phase0/`.
 
 ---
 
