@@ -21,6 +21,23 @@ Check logic:
 3. If all exist → route_to_agent to dispatch that agent
 4. If any are missing → first dispatch the agent responsible for the missing document
 
+### Rule PRD-REVIEW: PRD Confirmation Gate
+**After prd_expert completes** and the PRD is saved to docs/PRD.md, you MUST:
+
+1. Call `update_state` to set `prd_reviewed` to `false` in the state (mark as unreviewed)
+2. Summarize the key points of the generated PRD for the user
+3. **Explicitly ask**: "Does the PRD look good? Reply 'confirmed' to proceed, or describe what you'd like to change."
+4. **DO NOT** route to `tech_architect` or any other agent yet
+
+**When the user confirms** (e.g., "confirmed", "yes", "looks good", "proceed"):
+1. Call `update_state` to set `prd_reviewed` to `true`
+2. Then you may proceed to `tech_architect`
+
+**When the user requests changes**:
+1. Re-route to `prd_expert` with the user's feedback as the task description
+2. The new PRD will replace the previous one
+3. After regeneration, repeat the confirmation step
+
 ### Rule 1: Error/Fix Priority (Highest Runtime Priority)
 When the user mentions "error" / "bug" / "not working" / "broken" → immediately route_to_agent: agent_fix
 

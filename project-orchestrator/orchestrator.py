@@ -260,5 +260,15 @@ class ProjectOrchestrator:
                 console.print(
                     f"\n[bold green]➡️  Phase 0 in progress: Next → {agent_display}[/bold green]"
                 )
+            else:
+                # PRD completed but awaiting user review
+                prd_status = self.state["phase0_documents"]["prd_expert"]["status"]
+                if prd_status == "completed" and not self.state.get("prd_reviewed", False):
+                    console.print(
+                        "\n[bold yellow]📋 PRD has been generated — please review docs/PRD.md[/bold yellow]"
+                    )
+                    console.print(
+                        "[dim]Reply 'confirmed' to proceed, or describe what you'd like to change.[/dim]"
+                    )
 
         self.state = run_orchestrator_turn(user_input, self.state)

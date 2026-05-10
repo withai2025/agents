@@ -24,6 +24,7 @@ DEFAULT_STATE = {
     },
     "conflict_log": [],
     "retry_counts": {},
+    "prd_reviewed": False,
     "last_updated": "",
 }
 
@@ -100,8 +101,18 @@ def init_state(project_name: str) -> dict:
 
 
 def get_next_phase0_agent(state: dict) -> str | None:
-    """Return the name of the next pending Phase 0 agent, or None if all complete."""
+    """Return the name of the next pending Phase 0 agent, or None if all complete.
+
+    If PRD is complete but the user hasn't reviewed it yet, block and return None
+    so the orchestrator waits for confirmation before proceeding.
+    """
     from config import PHASE0_ORDER
+
+    # PRD review gate: block further progress until user confirms the PRD
+    prd_status = state["phase0_documents"].get("prd_expert", {}).get("status")
+    if prd_status == "completed" and not state.get("prd_reviewed", False):
+        return None
+
     for agent_name in PHASE0_ORDER:
         doc_state = state["phase0_documents"].get(agent_name, {})
         if doc_state.get("status") != "completed":
