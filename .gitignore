@@ -11,3 +11,4 @@ venv/
 # AppForge runtime artifacts — generated per user, never commit
 project-orchestrator/project_state.json
 project-orchestrator/docs/
+project-orchestrator/projects/

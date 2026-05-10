@@ -20,6 +20,7 @@ from state import (
     mark_agent_completed,
     mark_agent_failed,
     increment_retry,
+    list_projects,
 )
 from worker import run_worker, save_agent_output
 
@@ -98,7 +99,8 @@ def execute_tool(tool_name: str, tool_input: dict, state: dict) -> tuple[str, di
         return json.dumps(state, ensure_ascii=False, indent=2), state
 
     elif tool_name == "read_file":
-        path = Path(tool_input["path"])
+        project_dir = Path(state["_project_dir"])
+        path = project_dir / tool_input["path"]
         if path.exists():
             return path.read_text(encoding="utf-8"), state
         return f"[File not found: {tool_input['path']}]", state
@@ -128,13 +130,14 @@ def execute_tool(tool_name: str, tool_input: dict, state: dict) -> tuple[str, di
         retry_count = state["retry_counts"].get(agent_name, 0)
         result = None
         error_msg = None
+        project_dir = Path(state["_project_dir"])
 
         for attempt in range(MAX_RETRIES + 1):
             try:
-                result = run_worker(agent_name, task_desc, stream=True)
+                result = run_worker(agent_name, task_desc, project_dir, stream=True)
 
                 # If Phase 0 document generation, save output file
-                saved_path = save_agent_output(agent_name, result)
+                saved_path = save_agent_output(agent_name, result, project_dir)
                 if saved_path:
                     state = mark_agent_completed(state, agent_name)
 
@@ -211,11 +214,16 @@ def run_orchestrator_turn(user_input: str, state: dict) -> dict:
 
 
 class ProjectOrchestrator:
-    def __init__(self):
-        self.state = load_state()
-        if not self.state.get("project_name"):
-            self.state = init_state(PROJECT_NAME)
-        Path("docs").mkdir(exist_ok=True)
+    def __init__(self, project_name: str | None = None):
+        if project_name:
+            self.state = init_state(project_name)
+        else:
+            # Load most recently updated project (backward compat)
+            projects = list_projects()
+            if projects:
+                self.state = load_state(projects[0]["name"])
+            else:
+                self.state = init_state(PROJECT_NAME)
 
     def print_status(self):
         """Print current project status table"""

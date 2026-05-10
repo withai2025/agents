@@ -6,6 +6,7 @@ Usage: python main.py
 
 import os
 import sys
+import re
 from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
@@ -15,7 +16,7 @@ console = Console()
 
 
 def show_welcome():
-    """Show project introduction — works without API key"""
+    """Show project introduction — works without API key."""
     console.print(
         Panel(
             "[bold blue]🚀 Project Orchestrator v2.0[/bold blue]\n"
@@ -105,7 +106,7 @@ def _write_env_file(key: str):
 
 
 def show_help():
-    """Show commands available without an API key."""
+    """Show commands available."""
     table = Table(title="Available Commands", border_style="dim")
     table.add_column("Command", style="bold cyan")
     table.add_column("Description")
@@ -113,6 +114,7 @@ def show_help():
     table.add_row("intro", "Show project introduction")
     table.add_row("setup", "Configure or change your API key")
     table.add_row("status", "View current development progress")
+    table.add_row("projects", "Switch to a different project")
     table.add_row("exit", "Exit the system")
     table.add_row("<your app idea>", "Send to Orchestrator for analysis and scheduling")
     console.print()
@@ -120,18 +122,91 @@ def show_help():
     console.print()
 
 
+def select_project() -> str | None:
+    """Show existing projects and let the user continue or create a new one.
+
+    Returns the project name, or None if the user wants to exit.
+    """
+    from state import list_projects, PROJECTS_DIR
+
+    projects = list_projects()
+
+    if projects:
+        console.print()
+        console.print("[bold]Your projects:[/bold]")
+        console.print()
+
+        table = Table(show_header=True, border_style="dim")
+        table.add_column("#", style="dim", width=4)
+        table.add_column("Project", style="bold cyan")
+        table.add_column("Phase 0", style="white")
+        table.add_column("Last Updated", style="dim")
+
+        for i, p in enumerate(projects, 1):
+            table.add_row(str(i), p["name"], p["phase0_progress"], p["last_updated"][:19])
+
+        console.print(table)
+        console.print(f"  [dim]{len(projects) + 1}.[/dim] [bold green]➕  Create a new project[/bold green]")
+        console.print()
+
+        while True:
+            choice = console.input(
+                f"[bold]Select a project [1-{len(projects) + 1}][/bold] (or 'q' to quit): "
+            ).strip()
+            if choice.lower() == "q":
+                return None
+            try:
+                idx = int(choice)
+                if 1 <= idx <= len(projects):
+                    return projects[idx - 1]["name"]
+                elif idx == len(projects) + 1:
+                    break
+                else:
+                    console.print(f"[yellow]Please enter 1-{len(projects) + 1}[/yellow]")
+            except ValueError:
+                console.print("[yellow]Please enter a number[/yellow]")
+    else:
+        console.print("\n[dim]No existing projects found. Let's create your first one![/dim]\n")
+
+    # Create new project
+    while True:
+        name = console.input(
+            "[bold]Enter a name for your new project[/bold]\n"
+            "  (letters, numbers, hyphens, underscores — e.g. [dim]running-tracker[/dim]): "
+        ).strip()
+        if not name:
+            continue
+        if name.lower() == "q":
+            return None
+        if re.match(r"^[a-zA-Z0-9_-]+$", name):
+            existing = [p["name"] for p in projects]
+            if name in existing:
+                console.print(f"[yellow]Project '{name}' already exists. Pick a different name.[/yellow]")
+                continue
+            return name
+        console.print("[yellow]Only letters, numbers, hyphens, and underscores are allowed.[/yellow]")
+
+
 def main():
     show_welcome()
 
-    if not setup_api_key():
+    has_key = setup_api_key()
+    if not has_key:
         console.print("\n[yellow]No API key configured. You can run [bold]setup[/bold] later to configure one.[/yellow]")
         console.print("[dim]Running in preview mode — type [bold]help[/bold] for available commands.[/dim]\n")
 
-    from orchestrator import ProjectOrchestrator
-    orch = ProjectOrchestrator()
+    project_name = None
+    if has_key:
+        project_name = select_project()
+        if project_name is None:
+            console.print("Goodbye!")
+            return
 
-    # Print status if key is configured
-    if os.getenv("ANTHROPIC_API_KEY"):
+    from orchestrator import ProjectOrchestrator
+    orch = ProjectOrchestrator(project_name)
+
+    if has_key:
+        console.print(f"\n[bold green]📁 Project: {orch.state['project_name']}[/bold green]")
         orch.print_status()
 
     while True:
@@ -149,6 +224,15 @@ def main():
             elif user_input.lower() == "setup":
                 if setup_api_key():
                     console.print("[green]Orchestrator is ready — type your app idea to begin![/green]")
+            elif user_input.lower() == "projects":
+                if not os.getenv("ANTHROPIC_API_KEY"):
+                    console.print("[yellow]Requires an API key. Type [bold]setup[/bold] to configure one.[/yellow]")
+                else:
+                    new_project = select_project()
+                    if new_project:
+                        orch = ProjectOrchestrator(new_project)
+                        console.print(f"\n[bold green]📁 Switched to: {orch.state['project_name']}[/bold green]")
+                        orch.print_status()
             elif user_input.lower() == "status":
                 if not os.getenv("ANTHROPIC_API_KEY"):
                     console.print("[yellow]Status requires an API key. Type [bold]setup[/bold] to configure one.[/yellow]")

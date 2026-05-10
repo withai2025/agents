@@ -10,7 +10,7 @@ client = anthropic.Anthropic()
 
 
 def load_agent_prompt(agent_name: str) -> str:
-    """Load sub-agent system prompt"""
+    """Load sub-agent system prompt."""
     config = AGENT_REGISTRY[agent_name]
     prompt_path = Path(config["prompt_file"])
     if not prompt_path.exists():
@@ -18,11 +18,15 @@ def load_agent_prompt(agent_name: str) -> str:
     return prompt_path.read_text(encoding="utf-8")
 
 
-def load_context_docs(doc_paths: list[str]) -> str:
-    """Load context documents and merge into a single string"""
+def load_context_docs(doc_paths: list[str], project_dir: Path) -> str:
+    """Load context documents and merge into a single string.
+
+    Paths are resolved relative to the project directory so each project's
+    documents are isolated.
+    """
     parts = []
     for path in doc_paths:
-        p = Path(path)
+        p = project_dir / path
         if p.exists():
             content = p.read_text(encoding="utf-8")
             parts.append(f"\n\n---\n# Document: {path}\n\n{content}")
@@ -34,15 +38,16 @@ def load_context_docs(doc_paths: list[str]) -> str:
 def run_worker(
     agent_name: str,
     task_description: str,
+    project_dir: Path,
     extra_context: str = "",
     stream: bool = True,
 ) -> str:
-    """Execute sub-agent and return complete output"""
+    """Execute sub-agent and return complete output."""
     config = AGENT_REGISTRY[agent_name]
     system_prompt = load_agent_prompt(agent_name)
 
-    # Assemble context documents
-    context = load_context_docs(config.get("requires_docs", []))
+    # Assemble context documents from this project's directory
+    context = load_context_docs(config.get("requires_docs", []), project_dir)
     if extra_context:
         context += f"\n\n---\n# Extra Context\n\n{extra_context}"
 
@@ -87,15 +92,15 @@ def run_worker(
     return full_response
 
 
-def save_agent_output(agent_name: str, content: str) -> str | None:
-    """Save agent output to the corresponding document path; return the save path"""
+def save_agent_output(agent_name: str, content: str, project_dir: Path) -> str | None:
+    """Save agent output to the project's docs directory. Returns saved path."""
     config = AGENT_REGISTRY[agent_name]
     output_path = config.get("output_doc")
     if not output_path:
         return None
 
-    p = Path(output_path)
+    p = project_dir / output_path
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(content, encoding="utf-8")
     console.print(f"[green]✅ Document saved: {output_path}[/green]")
-    return output_path
+    return str(output_path)
