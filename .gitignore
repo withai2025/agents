@@ -7,3 +7,7 @@ dist/
 venv/
 *.swp
 .DS_Store
+
+# AppForge runtime artifacts — generated per user, never commit
+project-orchestrator/project_state.json
+project-orchestrator/docs/
