@@ -150,9 +150,11 @@ git clone https://github.com/withAIx/AppForge.git
 cd AppForge/project-orchestrator
 ```
 
-### 2. 安装依赖
+### 2. 创建虚拟环境并安装依赖
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate     # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -161,6 +163,10 @@ pip install -r requirements.txt
 ```bash
 python main.py
 ```
+
+首次启动时会提示粘贴 [Anthropic API Key](https://console.anthropic.com/)，密钥保存到 `.env`（gitignored，不上传）。
+
+> **或直接执行 `bash run.sh`** — 自动创建虚拟环境、安装依赖并启动。
 
 ### 4. 开始你的第一个项目
 
