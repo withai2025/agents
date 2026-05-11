@@ -2,6 +2,10 @@
 
 > **从产品构想到完整可运行 APP 的全生命周期 AI 编排系统**
 
+[![GitHub stars](https://img.shields.io/github/stars/withAIx/AppForge?style=social)](https://github.com/withAIx/AppForge/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/withAIx/AppForge)](https://github.com/withAIx/AppForge/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/withAIx/AppForge)](https://github.com/withAIx/AppForge/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/withAIx/AppForge)](https://github.com/withAIx/AppForge/pulls)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![Anthropic SDK](https://img.shields.io/badge/Anthropic%20SDK-0.40+-green.svg)](https://github.com/anthropics/anthropic-sdk-python)

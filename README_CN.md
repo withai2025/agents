@@ -6,10 +6,12 @@
 
 <p align="center">
   <a href="https://github.com/withAIx/AppForge/stargazers"><img src="https://img.shields.io/github/stars/withAIx/AppForge?style=social" alt="GitHub stars"></a>
+  <a href="https://github.com/withAIx/AppForge/network/members"><img src="https://img.shields.io/github/forks/withAIx/AppForge" alt="GitHub forks"></a>
+  <a href="https://github.com/withAIx/AppForge/issues"><img src="https://img.shields.io/github/issues/withAIx/AppForge" alt="GitHub issues"></a>
+  <a href="https://github.com/withAIx/AppForge/pulls"><img src="https://img.shields.io/github/issues-pr/withAIx/AppForge" alt="GitHub pull requests"></a>
   <a href="https://github.com/withAIx/AppForge/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python 3.11+"></a>
   <a href="https://github.com/anthropics/anthropic-sdk-python"><img src="https://img.shields.io/badge/Anthropic%20SDK-0.40+-green.svg" alt="Anthropic SDK"></a>
-  <a href="https://github.com/withAIx/AppForge/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
 </p>
 
 <p align="center">

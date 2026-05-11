@@ -106,7 +106,17 @@ def execute_tool(tool_name: str, tool_input: dict, state: dict) -> tuple[str, di
         return f"[File not found: {tool_input['path']}]", state
 
     elif tool_name == "update_state":
-        state.update(tool_input["updates"])
+        updates = tool_input["updates"]
+        old_name = state.get("project_name")
+        new_name = updates.get("project_name")
+        state.update(updates)
+        if new_name and new_name != old_name:
+            # Rename project directory to match
+            old_dir = Path(state["_project_dir"])
+            new_dir = old_dir.parent / new_name
+            if old_dir.exists() and old_dir != new_dir:
+                old_dir.rename(new_dir)
+                state["_project_dir"] = str(new_dir)
         save_state(state)
         return "State updated successfully", state
 
@@ -259,6 +269,10 @@ class ProjectOrchestrator:
                 agent_display = AGENT_REGISTRY[next_agent]["display_name"]
                 console.print(
                     f"\n[bold green]➡️  Phase 0 in progress: Next → {agent_display}[/bold green]"
+                )
+            elif not self.state.get("name_confirmed", False):
+                console.print(
+                    "\n[bold yellow]🏷️  New project — describe your app idea and I'll suggest a name[/bold yellow]"
                 )
             else:
                 # PRD completed but awaiting user review

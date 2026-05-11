@@ -6,7 +6,6 @@ Usage: python main.py
 
 import os
 import sys
-import re
 from pathlib import Path
 from rich.console import Console
 from rich.panel import Panel
@@ -168,23 +167,12 @@ def select_project() -> str | None:
     else:
         console.print("\n[dim]No existing projects found. Let's create your first one![/dim]\n")
 
-    # Create new project
-    while True:
-        name = console.input(
-            "[bold]Enter a name for your new project[/bold]\n"
-            "  (letters, numbers, hyphens, underscores — e.g. [dim]running-tracker[/dim]): "
-        ).strip()
-        if not name:
-            continue
-        if name.lower() == "q":
-            return None
-        if re.match(r"^[a-zA-Z0-9_-]+$", name):
-            existing = [p["name"] for p in projects]
-            if name in existing:
-                console.print(f"[yellow]Project '{name}' already exists. Pick a different name.[/yellow]")
-                continue
-            return name
-        console.print("[yellow]Only letters, numbers, hyphens, and underscores are allowed.[/yellow]")
+    # Create new project — use a temp name; the orchestrator will suggest a proper
+    # name once the user describes what they want to build.
+    import time
+    temp_name = f"new-{int(time.time()) % 100000:05d}"
+    console.print(f"\n[dim]Creating new project '{temp_name}' — describe your app and I'll suggest a better name![/dim]")
+    return temp_name
 
 
 def main():

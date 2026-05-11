@@ -25,6 +25,7 @@ DEFAULT_STATE = {
     "conflict_log": [],
     "retry_counts": {},
     "prd_reviewed": False,
+    "name_confirmed": False,   # True once user confirms the suggested project name
     "last_updated": "",
 }
 
@@ -107,6 +108,10 @@ def get_next_phase0_agent(state: dict) -> str | None:
     so the orchestrator waits for confirmation before proceeding.
     """
     from config import PHASE0_ORDER
+
+    # Name gate: block until user confirms the project name
+    if not state.get("name_confirmed", False):
+        return None
 
     # PRD review gate: block further progress until user confirms the PRD
     prd_status = state["phase0_documents"].get("prd_expert", {}).get("status")
